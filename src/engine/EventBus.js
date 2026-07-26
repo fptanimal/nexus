@@ -1,0 +1,26 @@
+class EventBus {
+  constructor() {
+    this.listeners = {};
+  }
+
+  on(event, callback) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push(callback);
+  }
+
+  off(event, callback) {
+    if (!this.listeners[event]) return;
+    this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
+  }
+
+  emit(event, payload) {
+    if (!this.listeners[event]) return;
+    this.listeners[event].forEach(cb => cb(payload));
+  }
+}
+
+// Export as a singleton
+const eventBus = new EventBus();
+export default eventBus;

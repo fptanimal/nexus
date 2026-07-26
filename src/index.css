@@ -1,0 +1,745 @@
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════
+   OVERLOAD — 16-bit Retro RPG Design System
+   ══════════════════════════════════════════════════════════ */
+
+@theme {
+  --font-pixel: "Fredoka", system-ui, sans-serif;
+  --font-sans: "Quicksand", system-ui, sans-serif;
+
+  /* Retro Dark Palette (HSL-based) */
+  --color-bg-deep: hsl(240 30% 6%);
+  --color-bg-base: hsl(235 25% 10%);
+  --color-bg-surface: hsl(230 22% 14%);
+  --color-bg-elevated: hsl(228 20% 18%);
+  --color-border: hsl(230 15% 22%);
+  --color-border-light: hsl(230 12% 28%);
+
+  /* Text */
+  --color-text-primary: hsl(210 20% 90%);
+  --color-text-secondary: hsl(215 15% 60%);
+  --color-text-muted: hsl(220 10% 40%);
+
+  /* Stats — Pixel-perfect accent colors */
+  --color-energy: hsl(152 70% 50%);
+  --color-energy-glow: hsl(152 70% 50% / 0.4);
+  --color-stress: hsl(0 75% 60%);
+  --color-stress-glow: hsl(0 75% 60% / 0.4);
+  --color-connection: hsl(210 80% 60%);
+  --color-connection-glow: hsl(210 80% 60% / 0.4);
+  --color-academics: hsl(45 90% 55%);
+  --color-academics-glow: hsl(45 90% 55% / 0.4);
+
+  /* Accent */
+  --color-accent: hsl(265 70% 65%);
+  --color-accent-glow: hsl(265 70% 65% / 0.3);
+  --color-speak-out: hsl(265 70% 55%);
+  --color-cyan: hsl(185 75% 55%);
+  --color-cyan-glow: hsl(185 75% 55% / 0.3);
+}
+
+/* ── Base Reset ────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg-deep);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scrollbar (Retro thin) ────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-light);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* ══════════════════════════════════════════════════════════
+   PIXEL BORDER — Dùng box-shadow tạo viền kiểu pixel
+   ══════════════════════════════════════════════════════════ */
+.pixel-border {
+  border: 2px solid var(--color-border-light);
+  box-shadow:
+    inset 0 0 0 1px var(--color-bg-deep),
+    0 0 0 2px var(--color-bg-deep),
+    2px 2px 0 0 var(--color-border);
+}
+
+.pixel-border-accent {
+  border: 2px solid var(--color-accent);
+  box-shadow:
+    inset 0 0 0 1px var(--color-bg-deep),
+    0 0 0 2px var(--color-bg-deep),
+    0 0 12px var(--color-accent-glow);
+}
+
+/* ══════════════════════════════════════════════════════════
+   CRT SCREEN EFFECTS
+   ══════════════════════════════════════════════════════════ */
+
+/* Scanlines overlay — đặt lên Game Canvas */
+.crt-scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    hsl(0 0% 0% / 0.08) 1px,
+    hsl(0 0% 0% / 0.08) 2px
+  );
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Vignette — tối các góc màn hình */
+.crt-vignette::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    hsl(0 0% 0% / 0.5) 100%
+  );
+  pointer-events: none;
+  z-index: 49;
+}
+
+/* Phosphor glow — ánh sáng nhẹ lan ra từ nội dung */
+.crt-glow {
+  filter: contrast(1.05) brightness(1.02);
+}
+
+/* CRT Screen frame — khung viền mô phỏng TV cũ */
+.crt-frame {
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 60px hsl(0 0% 0% / 0.3),
+    0 0 20px hsl(0 0% 0% / 0.5),
+    0 0 4px hsl(265 70% 65% / 0.15);
+}
+
+/* ══════════════════════════════════════════════════════════
+   STAT BARS — RPG-style
+   ══════════════════════════════════════════════════════════ */
+.stat-bar-track {
+  height: 8px;
+  background: var(--color-bg-deep);
+  border: 1px solid var(--color-border);
+  border-radius: 1px;
+  overflow: hidden;
+  position: relative;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+
+.stat-bar-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    hsl(0 0% 100% / 0.25) 0%,
+    transparent 50%,
+    hsl(0 0% 0% / 0.15) 100%
+  );
+}
+
+/* Pixel-stepped animation cho stat bars khi thay đổi */
+.stat-bar-fill.energy { background: var(--color-energy); box-shadow: 0 0 8px var(--color-energy-glow); }
+.stat-bar-fill.stress { background: var(--color-stress); box-shadow: 0 0 8px var(--color-stress-glow); }
+.stat-bar-fill.connection { background: var(--color-connection); box-shadow: 0 0 8px var(--color-connection-glow); }
+.stat-bar-fill.academics { background: var(--color-academics); box-shadow: 0 0 8px var(--color-academics-glow); }
+.stat-bar-fill.authenticity { background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent-glow); }
+
+/* ══════════════════════════════════════════════════════════
+   RPG ACTION BUTTONS
+   ══════════════════════════════════════════════════════════ */
+.rpg-btn {
+  position: relative;
+  padding: 10px 14px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.rpg-btn:hover:not(:disabled) {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-light);
+  transform: translateX(3px);
+  box-shadow: -3px 0 0 0 var(--color-accent);
+}
+
+.rpg-btn:active:not(:disabled) {
+  transform: translateX(3px) scale(0.98);
+}
+
+.rpg-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.rpg-btn.highlight {
+  border-color: var(--color-cyan);
+  background: hsl(185 75% 55% / 0.08);
+}
+
+.rpg-btn.highlight:hover:not(:disabled) {
+  background: hsl(185 75% 55% / 0.15);
+  box-shadow: -3px 0 0 0 var(--color-cyan);
+}
+
+/* Selector arrow (▸) cho nút đang hover */
+.rpg-btn:hover:not(:disabled)::before {
+  content: "▸";
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-accent);
+  font-size: 10px;
+  animation: blink-cursor 0.8s step-end infinite;
+}
+
+/* ══════════════════════════════════════════════════════════
+   DIALOGUE BOX — RPG-style với pixel border
+   ══════════════════════════════════════════════════════════ */
+.dialogue-box {
+  background: var(--color-bg-base);
+  border: 2px solid var(--color-border-light);
+  box-shadow:
+    inset 0 0 0 1px var(--color-bg-deep),
+    0 4px 24px hsl(0 0% 0% / 0.5),
+    0 0 0 2px var(--color-bg-deep);
+}
+
+.dialogue-choice {
+  padding: 12px 16px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  font-size: 13px;
+}
+
+.dialogue-choice:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-accent);
+  padding-left: 24px;
+}
+
+.dialogue-choice:hover::before {
+  content: "▸";
+  position: absolute;
+  left: 10px;
+  color: var(--color-accent);
+  animation: blink-cursor 0.8s step-end infinite;
+}
+
+.dialogue-choice.speak-out {
+  border-color: var(--color-speak-out);
+  background: hsl(265 70% 55% / 0.1);
+}
+
+.dialogue-choice.speak-out:hover {
+  background: hsl(265 70% 55% / 0.2);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 12px var(--color-accent-glow);
+}
+
+/* ══════════════════════════════════════════════════════════
+   CHAT PANEL (Mèo Cố Vấn)
+   ══════════════════════════════════════════════════════════ */
+.chat-bubble-cat {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 2px 12px 12px 12px;
+  color: var(--color-text-primary);
+}
+
+.chat-bubble-user {
+  background: var(--color-accent);
+  border: 1px solid hsl(265 70% 75% / 0.3);
+  border-radius: 12px 2px 12px 12px;
+  color: white;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ANIMATIONS
+   ══════════════════════════════════════════════════════════ */
+
+/* Cursor blink kiểu terminal */
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Glitch khi stress cao */
+.glitch-effect {
+  animation: glitch 0.15s linear infinite;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); filter: hue-rotate(0deg); }
+  20% { transform: translate(-2px, 1px); filter: hue-rotate(5deg); }
+  40% { transform: translate(1px, -1px); }
+  60% { transform: translate(-1px, 0); filter: hue-rotate(-5deg); }
+  80% { transform: translate(2px, 1px); }
+  100% { transform: translate(0); filter: hue-rotate(0deg); }
+}
+
+/* Trạng thái Overload cực hạn */
+.overload-effect {
+  animation: glitch 0.1s linear infinite, overload-pulse 2s ease-in-out infinite;
+}
+
+@keyframes overload-pulse {
+  0%, 100% { filter: grayscale(80%) contrast(1.5) blur(1px); }
+  50% { filter: grayscale(100%) contrast(2) blur(3px) brightness(0.6); }
+}
+
+/* Chromatic aberration - hiệu ứng lệch màu khi stress */
+.chromatic-aberration {
+  text-shadow: 
+    -1px 0 hsl(0 100% 50% / 0.3),
+    1px 0 hsl(200 100% 50% / 0.3);
+}
+
+/* Pulse cho stat bị warning */
+.stat-warning {
+  animation: stat-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes stat-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Typewriter text animation */
+.typewriter {
+  overflow: hidden;
+  border-right: 2px solid var(--color-accent);
+  white-space: nowrap;
+  animation: 
+    typing 2s steps(30) forwards,
+    blink-cursor 0.8s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Fade in */
+.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Float animation cho NPC */
+.float-idle {
+  animation: floatIdle 3s ease-in-out infinite;
+}
+
+@keyframes floatIdle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Bounce cho "SPACE to Talk" */
+.pixel-bounce {
+  animation: pixelBounce 1.2s steps(4) infinite;
+}
+
+@keyframes pixelBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-6px); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   GAME CANVAS TILES & SPRITES
+   ══════════════════════════════════════════════════════════ */
+
+/* Player sprite glow */
+.player-sprite {
+  image-rendering: pixelated;
+  box-shadow: 0 0 12px var(--color-energy-glow);
+  transition: left 0.12s steps(2), top 0.12s steps(2);
+}
+
+/* NPC sprite base */
+.npc-sprite {
+  image-rendering: pixelated;
+  transition: transform 0.3s ease;
+}
+
+.npc-sprite:hover {
+  transform: scale(1.1);
+}
+
+/* Grid tile */
+.grid-tile {
+  border: 0.5px solid hsl(230 15% 15%);
+  background: var(--color-bg-surface);
+}
+
+/* Tile variants for map variety */
+.tile-floor { background: hsl(230 18% 13%); }
+.tile-wall { background: hsl(225 20% 20%); border-color: hsl(225 15% 25%); }
+.tile-desk { background: hsl(30 25% 18%); }
+.tile-door { background: hsl(45 40% 25%); box-shadow: inset 0 0 4px hsl(45 40% 35%); }
+
+/* ══════════════════════════════════════════════════════════
+   MODAL OVERLAY
+   ══════════════════════════════════════════════════════════ */
+.modal-overlay {
+  background: hsl(240 30% 4% / 0.85);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: var(--color-bg-base);
+  border: 2px solid var(--color-border-light);
+  box-shadow:
+    0 0 0 2px var(--color-bg-deep),
+    0 8px 32px hsl(0 0% 0% / 0.6),
+    0 0 80px hsl(265 70% 65% / 0.08);
+}
+
+/* ══════════════════════════════════════════════════════════
+   TITLE SCREEN
+   ══════════════════════════════════════════════════════════ */
+.title-glow {
+  text-shadow:
+    0 0 10px var(--color-accent-glow),
+    0 0 30px hsl(265 70% 65% / 0.2),
+    0 0 60px hsl(265 70% 65% / 0.1);
+  letter-spacing: 0.15em;
+}
+
+.time-select-btn {
+  padding: 14px 20px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.time-select-btn:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-accent);
+  transform: translateX(4px);
+  box-shadow: -4px 0 0 0 var(--color-accent);
+}
+
+.time-select-btn:hover::before {
+  content: "▸ ";
+  color: var(--color-accent);
+  animation: blink-cursor 0.8s step-end infinite;
+}
+
+/* ══════════════════════════════════════════════════════════
+   SIDEBAR (Sidebar trái — Stats & Actions)
+   ══════════════════════════════════════════════════════════ */
+.sidebar {
+  background: var(--color-bg-base);
+  border-right: 2px solid var(--color-border);
+}
+
+.sidebar-section {
+  padding: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar-label {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   JOURNAL (Nhật ký)
+   ══════════════════════════════════════════════════════════ */
+.journal-page {
+  background: hsl(40 20% 10%);
+  border: 1px solid hsl(40 15% 20%);
+  font-style: italic;
+  line-height: 1.8;
+  position: relative;
+}
+
+.journal-page::before {
+  content: "";
+  position: absolute;
+  left: 32px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: hsl(0 40% 35% / 0.3);
+}
+
+/* ══════════════════════════════════════════════════════════
+   UTILITIES
+   ══════════════════════════════════════════════════════════ */
+.font-pixel {
+  font-family: var(--font-pixel);
+}
+
+.text-glow-energy {
+  text-shadow: 0 0 6px var(--color-energy-glow);
+}
+
+.text-glow-stress {
+  text-shadow: 0 0 6px var(--color-stress-glow);
+}
+
+.text-glow-accent {
+  text-shadow: 0 0 6px var(--color-accent-glow);
+}
+
+.pixel-panel {
+  background-color: #e8f5e9;
+  border: 4px solid #81c784;
+  box-shadow: 
+    inset 4px 4px 0px 0px #ffffff,
+    inset -4px -4px 0px 0px #c8e6c9,
+    8px 8px 0px 0px rgba(0,0,0,0.15);
+  border-radius: 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   THERAPEUTIC PIXEL ART (TITLE SCREEN REDESIGN)
+   ══════════════════════════════════════════════════════════ */
+.sky-bg {
+  background-image: url('./assets/pixel_sky_bg.png');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+.sky-clouds {
+  display: none;
+}
+
+.font-cursive {
+  font-family: 'Dancing Script', cursive;
+}
+
+.gold-text-shadow {
+  text-shadow: 
+    0 4px 0 #8b4513,
+    0 6px 4px rgba(139, 69, 19, 0.4),
+    0 0 20px rgba(253, 224, 71, 0.6);
+}
+
+/* Pebble Buttons */
+.pebble {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 60px;
+  border-radius: 0;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 
+    inset -4px -4px 0px rgba(0, 0, 0, 0.2),
+    inset 4px 4px 0px rgba(255, 255, 255, 0.4),
+    4px 4px 0px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  border: 4px solid #fff;
+}
+
+@media (min-width: 768px) {
+  .pebble {
+    width: 96px;
+    height: 72px;
+  }
+}
+
+.pebble:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 
+    inset -4px -4px 0px rgba(0, 0, 0, 0.2),
+    inset 4px 4px 0px rgba(255, 255, 255, 0.5),
+    8px 8px 0px rgba(0, 0, 0, 0.2);
+}
+
+.pebble-selected {
+  transform: translateY(2px);
+  box-shadow: 
+    inset -2px -2px 0px rgba(0, 0, 0, 0.2),
+    inset 2px 2px 0px rgba(255, 255, 255, 0.2),
+    0 2px 0px rgba(0, 0, 0, 0.1);
+  border: 4px solid #fff;
+}
+
+.pebble-green { background: #8fbc8f; }
+.pebble-beige { background: #d2b48c; }
+.pebble-grey { background: #a9a9a9; }
+.pebble-brown { background: #cd853f; }
+
+/* Therapeutic Panel */
+.therapeutic-panel {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+/* Therapy Cards */
+.therapy-card {
+  width: 90px;
+  height: 130px;
+  border-radius: 8px;
+  background: #fff;
+  padding: 4px;
+  box-shadow: 2px 4px 8px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-pattern {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.forest-pattern {
+  background: 
+    radial-gradient(circle at 50% 50%, #8b5a2b 10%, transparent 11%),
+    repeating-linear-gradient(45deg, #a0522d 0, #a0522d 2px, #8b4513 2px, #8b4513 4px);
+  background-size: 20px 20px, 100% 100%;
+}
+
+.mandala-pattern {
+  background-color: #f5deb3;
+  background-image: 
+    radial-gradient(circle at 50% 50%, #cd853f 10%, transparent 11%),
+    radial-gradient(circle at 50% 50%, transparent 20%, #d2b48c 21%, #d2b48c 22%, transparent 23%),
+    radial-gradient(circle at 50% 50%, transparent 30%, #deb887 31%, #deb887 32%, transparent 33%);
+}
+
+.card-ocean {
+  background: linear-gradient(180deg, #e0f7fa 0%, #b2ebf2 100%);
+}
+
+.card-label {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #3e2723;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+}
+
+/* Crystal Bubble -> Pixel Start Button */
+.crystal-bubble {
+  width: 140px;
+  height: 140px;
+  border-radius: 0;
+  background: #81d4fa;
+  box-shadow: 
+    inset -8px -8px 0px rgba(0,0,0,0.2),
+    inset 8px 8px 0px rgba(255,255,255,0.7),
+    8px 8px 0px rgba(41, 182, 246, 0.4);
+  position: relative;
+  overflow: hidden;
+  border: 4px solid #fff;
+  cursor: pointer;
+}
+
+.crystal-glare {
+  display: none;
+}
+
+.rounded-bubble {
+  display: none;
+}
+
+/* Therapy List Items */
+.therapy-list-item {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  width: 100%;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CHARACTER SPRITES ANIMATIONS
+   ══════════════════════════════════════════════════════════ */
+.player-idle {
+  animation: playerBob 1s steps(2, end) infinite;
+}
+
+@keyframes playerBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.npc-idle {
+  animation: npcBob 1.5s steps(2, end) infinite;
+}
+
+@keyframes npcBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}

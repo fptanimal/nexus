@@ -1,0 +1,43 @@
+{
+  "chapters": {
+    "0": {
+      "light": 1.0,
+      "weather": "clear",
+      "decorations": {
+        "desk": ["book_1"],
+        "floor": [],
+        "plant": "bloom"
+      },
+      "music": "bgm_calm",
+      "ambient": "bird_morning"
+    },
+    "1": {
+      "light": 1.0,
+      "weather": "clear",
+      "decorations": {
+        "desk": ["book_1", "book_2", "sticky_notes"],
+        "floor": [],
+        "plant": "normal"
+      },
+      "music": "bgm_study",
+      "ambient": "clock_tick"
+    },
+    "4": {
+      "light": 0.4,
+      "weather": "storm",
+      "decorations": {
+        "desk": ["book_stack", "coffee_cups", "exam_papers"],
+        "floor": ["clothes_mess", "trash"],
+        "plant": "dead"
+      },
+      "music": "bgm_tension",
+      "ambient": "heavy_rain_wind"
+    }
+  },
+  "mood_overrides": {
+    "burnout": {
+      "light": 0.3,
+      "ambient_volume": 1.5
+    }
+  }
+}

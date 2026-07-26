@@ -1,0 +1,8 @@
+{
+  "thresholds": {
+    "calm": { "stress": [0, 30], "sleep": [70, 100], "selfEsteem": [50, 100] },
+    "busy": { "stress": [30, 60], "sleep": [40, 70] },
+    "overwhelmed": { "stress": [60, 85], "selfEsteem": [20, 50] },
+    "burnout": { "stress": [85, 100], "sleep": [0, 40], "selfEsteem": [0, 20] }
+  }
+}

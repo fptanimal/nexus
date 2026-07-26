@@ -1,0 +1,10 @@
+{
+  "initialState": {
+    "talkMom": false,
+    "missExam": false,
+    "sleepEarlyDays": 0,
+    "coffeeConsumed": 0,
+    "mathExamScore": null,
+    "diaryEntriesCount": 0
+  }
+}
