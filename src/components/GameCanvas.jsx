@@ -1593,57 +1593,96 @@ export default function GameCanvas() {
                ctx.fillStyle = '#78350f'; ctx.beginPath(); ctx.arc(x + 4, y + 10, 2, 0, Math.PI*2); ctx.fill();
             } 
             else if (style === 'student') {
-               // Chân bàn và ghế (sắt sơn tĩnh điện)
-               ctx.fillStyle = '#64748b'; 
+               // Chân bàn và ghế (màu gỗ sẫm / sắt đen)
+               ctx.fillStyle = '#3f3f46'; 
                // Chân ghế
                ctx.fillRect(x + 10, y + 26, 2, 8); ctx.fillRect(x + 20, y + 26, 2, 8);
                // Chân bàn
                ctx.fillRect(x + 2, y + 18, 2, 10); ctx.fillRect(x + 28, y + 18, 2, 10);
                
-               // Mặt ghế gỗ
-               ctx.fillStyle = '#f59e0b'; // Gỗ vàng tranh
-               fillRoundRect(x + 8, y + 22, 16, 8, 2);
-               ctx.fillStyle = '#d97706'; ctx.fillRect(x + 8, y + 28, 16, 2); // Cạnh ghế
-               
-               // Lưng tựa ghế (gỗ cong)
-               ctx.fillStyle = '#f59e0b';
-               fillRoundRect(x + 9, y + 32, 14, 4, 2);
-               ctx.fillStyle = '#d97706'; ctx.fillRect(x + 9, y + 35, 14, 1);
-               
-               // Khung đỡ tựa lưng (sắt)
-               ctx.fillStyle = '#64748b';
-               ctx.fillRect(x + 11, y + 30, 2, 4); ctx.fillRect(x + 19, y + 30, 2, 4);
-
-               // Mặt bàn (Gỗ sáng)
+               // Mặt bàn (Gỗ sẫm)
                ctx.shadowColor = 'rgba(0,0,0,0.3)';
-               ctx.fillStyle = '#fcd34d'; 
-               fillRoundRect(x, y + 2, 32, 20, 3);
+               ctx.fillStyle = '#b45309'; 
+               ctx.fillRect(x, y + 2, 32, 20); // Vuông vức hơn
                ctx.shadowColor = 'transparent';
                
                // Cạnh bàn và viền
-               ctx.fillStyle = '#f59e0b'; ctx.fillRect(x, y + 20, 32, 3);
-               ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.fillRect(x, y + 2, 32, 2);
+               ctx.fillStyle = '#78350f'; ctx.fillRect(x, y + 22, 32, 4); // Cạnh dày hơn
+               ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fillRect(x, y + 2, 32, 1); // Highlight
                
-               // Ngăn bàn (hộc bàn) xám nhạt
-               ctx.fillStyle = '#475569';
-               ctx.fillRect(x + 2, y + 22, 28, 4);
+               // Ngăn bàn (hộc bàn) xám sẫm
+               ctx.fillStyle = '#27272a';
+               ctx.fillRect(x + 2, y + 26, 28, 4);
+
+               // Khung đỡ tựa lưng ghế
+               ctx.fillStyle = '#3f3f46';
+               ctx.fillRect(x + 11, y + 26, 2, 12); ctx.fillRect(x + 19, y + 26, 2, 12);
+
+               // Mặt ghế gỗ
+               ctx.shadowColor = 'rgba(0,0,0,0.4)';
+               ctx.fillStyle = '#d97706';
+               ctx.fillRect(x + 8, y + 22, 16, 8); // Vuông vức
+               ctx.fillStyle = '#92400e'; ctx.fillRect(x + 8, y + 30, 16, 3); // Cạnh ghế
+               ctx.shadowColor = 'transparent';
                
-               // Ngẫu nhiên đặt đồ trên bàn (dựa vào x, y để pseudo-random)
+               // Lưng tựa ghế
+               ctx.fillStyle = '#d97706';
+               ctx.fillRect(x + 8, y + 34, 16, 6);
+               ctx.fillStyle = '#92400e'; ctx.fillRect(x + 8, y + 40, 16, 2);
+               
+               // === ĐỒ VẬT CHI TIẾT TRÊN BÀN (CLUTTER) ===
                const hash = (x + y) % 3;
-               if (hash === 0) {
-                 // Vở và bút
-                 ctx.fillStyle = '#f8fafc'; fillRoundRect(x + 4, y + 6, 10, 12, 1);
-                 ctx.fillStyle = '#cbd5e1'; ctx.fillRect(x + 8, y + 6, 1, 12);
-                 ctx.fillStyle = '#ef4444'; ctx.fillRect(x + 16, y + 10, 2, 6);
-               } else if (hash === 1) {
-                 // Sách giáo khoa
-                 ctx.fillStyle = '#38bdf8'; fillRoundRect(x + 20, y + 8, 8, 10, 1);
-                 ctx.fillStyle = '#0284c7'; ctx.fillRect(x + 20, y + 8, 2, 10);
-                 ctx.fillStyle = '#fef08a'; ctx.fillRect(x + 22, y + 10, 4, 4);
-               } else {
-                 // Hộp bút & giấy nháp
-                 ctx.fillStyle = '#a78bfa'; fillRoundRect(x + 22, y + 4, 6, 14, 2);
-                 ctx.fillStyle = '#ffffff'; fillRoundRect(x + 4, y + 8, 8, 8, 1);
+               if (hash === 0) { // Bàn bên trái: Chồng sách, giấy tờ, đồng hồ, la bàn
+                 // Chồng sách trái
+                 ctx.fillStyle = '#991b1b'; ctx.fillRect(x + 2, y + 14, 10, 4); // Sách đỏ
+                 ctx.fillStyle = '#fef08a'; ctx.fillRect(x + 3, y + 11, 8, 3); // Sách vàng
+                 ctx.fillStyle = '#166534'; ctx.fillRect(x + 2, y + 6, 10, 5); // Sách xanh
+                 // Giấy tờ lộn xộn giữa
+                 ctx.fillStyle = '#f8fafc';
+                 ctx.save(); ctx.translate(x + 16, y + 12); ctx.rotate(-0.1); ctx.fillRect(-6, -6, 10, 12); // Tờ dưới
+                 ctx.fillStyle = '#e2e8f0'; ctx.fillRect(-4, -4, 3, 1); ctx.fillRect(-4, -2, 4, 1); // Chữ
+                 ctx.rotate(0.2); ctx.fillStyle = '#ffffff'; ctx.fillRect(-4, -8, 8, 10); // Tờ trên
+                 ctx.fillStyle = '#cbd5e1'; ctx.fillRect(-2, -6, 3, 1); ctx.fillRect(-2, -4, 4, 1); // Chữ
+                 ctx.restore();
+                 // La bàn (Compa)
+                 ctx.strokeStyle = '#475569'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x + 20, y + 16); ctx.lineTo(x + 22, y + 8); ctx.lineTo(x + 24, y + 16); ctx.stroke();
+                 // Đồng hồ báo thức
+                 ctx.fillStyle = '#d97706'; ctx.beginPath(); ctx.arc(x + 28, y + 8, 4, 0, Math.PI * 2); ctx.fill();
+                 ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(x + 28, y + 8, 3, 0, Math.PI * 2); ctx.fill();
+                 ctx.fillStyle = '#000000'; ctx.fillRect(x + 28, y + 6, 1, 3); // Kim
+               } else if (hash === 1) { // Bàn giữa: Sách giáo khoa mở, bút, tẩy
+                 // Sổ tay mở bên trái
+                 ctx.fillStyle = '#0f172a'; ctx.fillRect(x + 4, y + 10, 12, 8); // Bìa sổ
+                 ctx.fillStyle = '#fef08a'; ctx.fillRect(x + 5, y + 11, 5, 6); // Trang trái
+                 ctx.fillStyle = '#fef08a'; ctx.fillRect(x + 11, y + 11, 4, 6); // Trang phải
+                 ctx.fillStyle = '#1e293b'; ctx.fillRect(x + 10, y + 10, 1, 8); // Gáy
+                 // Tẩy (Eraser)
+                 ctx.fillStyle = '#3b82f6'; ctx.fillRect(x + 18, y + 16, 2, 3);
+                 ctx.fillStyle = '#ffffff'; ctx.fillRect(x + 20, y + 16, 2, 3);
+                 // Sách giáo khoa mở to giữa
+                 ctx.fillStyle = '#38bdf8'; ctx.fillRect(x + 16, y + 4, 14, 10); // Bìa sách
+                 ctx.fillStyle = '#ffffff'; ctx.fillRect(x + 17, y + 5, 6, 8); // Trang trái
+                 ctx.fillStyle = '#ffffff'; ctx.fillRect(x + 24, y + 5, 5, 8); // Trang phải
+                 ctx.fillStyle = '#cbd5e1'; ctx.fillRect(x + 18, y + 6, 4, 1); ctx.fillRect(x + 18, y + 8, 3, 1); // Chữ
+                 ctx.fillRect(x + 25, y + 6, 3, 1); ctx.fillRect(x + 25, y + 8, 4, 1); // Chữ
+                 // Bút chì vàng
+                 ctx.fillStyle = '#facc15'; ctx.fillRect(x + 26, y + 16, 4, 1);
+                 ctx.fillStyle = '#ef4444'; ctx.fillRect(x + 30, y + 16, 1, 1); // Đầu tẩy bút
+               } else { // Bàn bên phải: Hộp bút, giấy kiểm tra, chậu cây nhỏ
+                 // Ống đựng bút
+                 ctx.fillStyle = '#d4d4d8'; ctx.fillRect(x + 4, y + 6, 5, 6);
+                 ctx.fillStyle = '#ef4444'; ctx.fillRect(x + 5, y + 3, 1, 4); // Bút đỏ
+                 ctx.fillStyle = '#3b82f6'; ctx.fillRect(x + 7, y + 4, 1, 3); // Bút xanh
+                 // Giấy kiểm tra A
+                 ctx.fillStyle = '#ffffff'; ctx.fillRect(x + 12, y + 4, 8, 10);
+                 ctx.fillStyle = '#ef4444'; ctx.font = '8px Arial'; ctx.fillText('A+', x + 13, y + 12);
+                 // Chồng Vở Bài Tập
+                 ctx.fillStyle = '#0ea5e9'; ctx.fillRect(x + 16, y + 14, 8, 6); // Vở xanh
+                 ctx.fillStyle = '#fca5a5'; ctx.fillRect(x + 20, y + 12, 8, 6); // Vở hồng
+                 ctx.fillStyle = '#4ade80'; ctx.fillRect(x + 24, y + 10, 6, 8); // Vở xanh lá
+                 // Chậu cây nhỏ đá sen
+                 ctx.fillStyle = '#a16207'; ctx.fillRect(x + 26, y + 4, 6, 4); // Chậu
+                 ctx.fillStyle = '#22c55e'; ctx.beginPath(); ctx.arc(x + 29, y + 3, 3, 0, Math.PI * 2); ctx.fill(); // Lá
                }
             }
          };
