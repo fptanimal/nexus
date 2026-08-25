@@ -3029,10 +3029,10 @@ export default function GameCanvas() {
       }
       else if (currentLocation === 'hospital_room') {
         if (pGridX >= 14 && pGridX <= 21 && pGridY >= 17 && pGridY <= 20) fObj = { type: 'doctor_desk', label: 'Khám bệnh' };
-        else if (pGridX >= 2 && pGridX <= 4 && pGridY >= 14 && pGridY <= 15) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ', gridX: 3, gridY: 14 };
-        else if (pGridX >= 2 && pGridX <= 4 && pGridY >= 7 && pGridY <= 8) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ', gridX: 3, gridY: 7 };
-        else if (pGridX >= 2 && pGridX <= 4 && pGridY >= 19 && pGridY <= 20) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ', gridX: 3, gridY: 19 };
-        else if (pGridX >= 24 && pGridX <= 26 && pGridY >= 2 && pGridY <= 3) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ', gridX: 25, gridY: 2 };
+        else if (pGridX >= 1 && pGridX <= 5 && pGridY >= 13 && pGridY <= 16) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ', gridX: 3, gridY: 14 };
+        else if (pGridX >= 1 && pGridX <= 5 && pGridY >= 6 && pGridY <= 9) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ', gridX: 3, gridY: 7 };
+        else if (pGridX >= 1 && pGridX <= 5 && pGridY >= 18 && pGridY <= 21) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ', gridX: 3, gridY: 19 };
+        else if (pGridX >= 23 && pGridX <= 27 && pGridY >= 1 && pGridY <= 4) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ', gridX: 25, gridY: 2 };
         else if (pGridX >= 13 && pGridX <= 18 && pGridY >= 21) fObj = { type: 'door', label: '[E] Ra ngoài' };
       }
       else if (currentLocation === 'library_room') {
