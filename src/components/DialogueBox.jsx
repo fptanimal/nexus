@@ -119,26 +119,82 @@ export default function DialogueBox() {
         {/* Choices */}
         <div className="flex flex-col gap-1">
           <button 
-            onClick={handleSpeakOut}
-            disabled={energy < 15}
-            className={`dialogue-choice speak-out ${energy < 15 ? 'opacity-35 cursor-not-allowed' : ''}`}
+            onClick={() => {
+              if (energy < 10) return;
+              audioSystem.playClick();
+              // Cost -10 energy, decrease stress by 20
+              useGameStore.setState(state => ({
+                energy: Math.max(0, state.energy - 10),
+                stress: Math.max(0, state.stress - 20)
+              }));
+              logDecision(`spoken_truth_${activeDialogue}`);
+              addJournalEntry(`Tôi đã nói với ${npc.name} rằng mình đang không ổn. Mất đi một chút năng lượng để lấy can đảm, nhưng thấy nhẹ nhõm hơn nhiều (-10 NL, -20 Căng thẳng).`);
+              endDialogue();
+            }}
+            disabled={energy < 10}
+            className={`dialogue-choice speak-out ${energy < 10 ? 'opacity-35 cursor-not-allowed' : ''}`}
             style={{ borderRadius: '2px' }}
           >
             <div className="flex justify-between items-center w-full">
-              <span style={{ color: energy >= 15 ? 'var(--color-accent)' : 'var(--color-text-muted)' }}>
-                [Nói ra] {npc.speakOutText}
+              <span style={{ color: energy >= 10 ? 'var(--color-accent)' : 'var(--color-text-muted)' }}>
+                [Nói thật lòng] {npc.speakOutText}
               </span>
               <span className="font-pixel shrink-0 ml-3" 
                 style={{ fontSize: '7px', color: 'var(--color-stress)', opacity: 0.7 }}>
-                -15 NL
+                -10 NL, -20 Stress
               </span>
             </div>
           </button>
 
-          <button onClick={handleHide} className="dialogue-choice" style={{ borderRadius: '2px' }}>
-            <span style={{ color: 'var(--color-text-secondary)' }}>
-              [Che giấu] {npc.hideText}
-            </span>
+          <button 
+            onClick={() => {
+              audioSystem.playClick();
+              // Cost 0 energy, but increase stress by 15
+              useGameStore.setState(state => ({
+                stress: Math.min(100, state.stress + 15)
+              }));
+              logDecision(`hide_${activeDialogue}`);
+              addJournalEntry(`Tôi gặp ${npc.name} nhưng quyết định giấu đi cảm xúc. Mọi thứ trở nên nặng nề hơn (+15 Căng thẳng).`);
+              endDialogue();
+            }}
+            className="dialogue-choice" style={{ borderRadius: '2px' }}
+          >
+             <div className="flex justify-between items-center w-full">
+              <span style={{ color: 'var(--color-text-secondary)' }}>
+                [Cố tỏ ra ổn] {npc.hideText}
+              </span>
+              <span className="font-pixel shrink-0 ml-3" 
+                style={{ fontSize: '7px', color: '#f87171', opacity: 0.7 }}>
+                +15 Stress
+              </span>
+            </div>
+          </button>
+
+          <button 
+            onClick={() => {
+              if (energy < 20) return;
+              audioSystem.playClick();
+              // Cost 20 energy, decrease stress heavily
+              useGameStore.setState(state => ({
+                energy: Math.max(0, state.energy - 20),
+                stress: Math.max(0, state.stress - 35)
+              }));
+              logDecision(`comfort_${activeDialogue}`);
+              addJournalEntry(`Tôi đã an ủi ${npc.name}. Mặc dù tốn nhiều sức lực, tôi thấy thanh thản vô cùng (-20 NL, -35 Căng thẳng).`);
+              endDialogue();
+            }}
+            disabled={energy < 20}
+            className={`dialogue-choice ${energy < 20 ? 'opacity-35 cursor-not-allowed' : ''}`} style={{ borderRadius: '2px' }}
+          >
+             <div className="flex justify-between items-center w-full">
+              <span style={{ color: energy >= 20 ? '#10b981' : 'var(--color-text-muted)' }}>
+                [An ủi bạn] "Cố lên, tớ cũng vậy. Mình cùng làm được mà!"
+              </span>
+              <span className="font-pixel shrink-0 ml-3" 
+                style={{ fontSize: '7px', color: '#10b981', opacity: 0.7 }}>
+                -20 NL, -35 Stress
+              </span>
+            </div>
           </button>
         </div>
       </div>

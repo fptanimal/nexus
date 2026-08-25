@@ -260,14 +260,14 @@ const MAPS = {
     }
     // Buồng vệ sinh (Toilet stalls)
     for(let c=24; c<=36; c++) {
-       m[23][c] = 9; // Lưng buồng
+       // Xóa khối va chạm ở lưng buồng để nhân vật có thể đi vào trong bồn cầu
        if (c % 2 === 0) {
            m[24][c] = 9; m[25][c] = 9; // Vách ngăn 2 bên
        }
     }
     // Cửa đóng cho một số buồng
-    m[25][27] = 9;
-    m[25][31] = 9;
+    // m[25][27] = 9;
+    // m[25][31] = 9;
 
     return m;
   })(),
@@ -275,28 +275,50 @@ const MAPS = {
     const rows = 24;
     const cols = 32;
     const m = Array(rows).fill(null).map(() => Array(cols).fill(0));
-    // Tường bao
+    
+    // Tường bao ngoài (Outer Walls)
     for (let c = 0; c < cols; c++) { m[0][c] = 1; m[rows-1][c] = 1; }
     for (let r = 0; r < rows; r++) { m[r][0] = 1; m[r][cols-1] = 1; }
     
-    // Vách ngăn phòng (Phòng cấp cứu bên trái, phòng hồi sức bên phải)
-    // (Đã xóa vách ngăn và cửa trong phòng theo yêu cầu)
-
-    // Cửa chính
-    m[23][15] = 0; m[23][16] = 0; 
+    // Cửa chính (Entrance)
+    for (let c = 14; c <= 17; c++) m[23][c] = 0;
     
-    // Quầy lễ tân (Reception)
-    for(let c=13; c<=18; c++) { m[18][c] = 2; m[19][c] = 2; }
+    // Vách tường dọc ngăn cách hành lang bên trái (c=13)
+    for (let r = 1; r < 23; r++) m[r][13] = 1;
+    // Cửa vào 2 phòng bên trái
+    m[9][13] = 0; m[10][13] = 0; // Cửa phòng trên
+    m[13][13] = 0; m[14][13] = 0; // Cửa phòng dưới
     
-    // Giường bệnh (2x2 blocks) trong các phòng
-    // Phòng trên trái
-    for(let r=2; r<=4; r+=2) { m[r][2]=2; m[r+1][2]=2; m[r][3]=2; m[r+1][3]=2; m[r][6]=2; m[r+1][6]=2; m[r][7]=2; m[r+1][7]=2;}
-    // Phòng dưới trái
-    for(let r=10; r<=12; r+=2) { m[r][2]=2; m[r+1][2]=2; m[r][3]=2; m[r+1][3]=2; m[r][6]=2; m[r+1][6]=2; m[r][7]=2; m[r+1][7]=2;}
-    // Phòng trên phải
-    for(let r=2; r<=4; r+=2) { m[r][24]=2; m[r+1][24]=2; m[r][25]=2; m[r+1][25]=2; m[r][28]=2; m[r+1][28]=2; m[r][29]=2; m[r+1][29]=2;}
-    // Phòng dưới phải
-    for(let r=10; r<=12; r+=2) { m[r][24]=2; m[r+1][24]=2; m[r][25]=2; m[r+1][25]=2; m[r][28]=2; m[r+1][28]=2; m[r][29]=2; m[r+1][29]=2;}
+    // Vách ngang chia đôi phòng bên trái (r=11)
+    for (let c = 1; c < 13; c++) m[11][c] = 1;
+    
+    // Quầy lễ tân (Reception L-shape to hơn)
+    for (let c = 14; c <= 21; c++) m[18][c] = 2; // Bàn ngang (r=18)
+    m[15][21] = 2; m[16][21] = 2; m[17][21] = 2; // Cạnh dọc của L
+    
+    // Giường bệnh nằm ngang (Scale up: 6x3 blocks)
+    const placeHorizontalBed = (startC, startR) => {
+      for(let r=startR; r<=startR+2; r++) {
+        for(let c=startC; c<=startC+5; c++) {
+          m[r][c] = 2;
+        }
+      }
+    };
+    
+    // Bên Trái (Cấp Cứu)
+    placeHorizontalBed(2, 2);
+    placeHorizontalBed(2, 7);
+    placeHorizontalBed(2, 14);
+    placeHorizontalBed(2, 19);
+    
+    // Bên Phải (Hồi Sức)
+    placeHorizontalBed(24, 2);
+    placeHorizontalBed(24, 7);
+    
+    // Tủ Thuốc (Pharmacy Cabinets) bên phải dưới (c=28..30)
+    for (let r = 13; r <= 21; r++) {
+      m[r][28] = 2; m[r][29] = 2; m[r][30] = 2;
+    }
     
     return m;
   })(),
@@ -349,7 +371,14 @@ const useGameStore = create((set, get) => ({
     { id: 'teacher1', name: 'Cô Giáo', x: 8, y: 3, color: 'bg-indigo-500', locations: ['classroom'], dialogue: 'Các em chú ý nghe giảng nhé! Đừng nói chuyện riêng.', facing: 'down' },
     { id: 'student1', name: 'Nam', x: 4, y: 10, color: 'bg-green-500', locations: ['classroom'], dialogue: 'Trời ơi, bài toán này khó quá đi mất...', facing: 'up', sitting: true },
     { id: 'student2', name: 'Hoa', x: 12, y: 14, color: 'bg-yellow-400', locations: ['classroom'], dialogue: 'Cậu làm xong bài chưa? Cho tớ chép với!', facing: 'up', sitting: true },
-    { id: 'student3', name: 'Tuấn', x: 6, y: 22, color: 'bg-red-400', locations: ['classroom'], dialogue: 'Tối nay về chơi game không? Tớ rảnh lắm!', facing: 'up', sitting: true }
+    { id: 'student3', name: 'Tuấn', x: 6, y: 22, color: 'bg-red-400', locations: ['classroom'], dialogue: 'Tối nay về chơi game không? Tớ rảnh lắm!', facing: 'up', sitting: true },
+    // Bệnh viện
+    { id: 'doctor1', name: 'BS. Tâm Lý', x: 18, y: 17, color: 'bg-sky-400', locations: ['hospital_room'], dialogue: 'Chào bạn, dạo này bạn có thấy áp lực quá không? Cứ bình tĩnh ngồi xuống đây nhé.', facing: 'down' },
+    { id: 'patient1', name: 'Bệnh Nhân A', x: 5, y: 3, color: 'bg-slate-400', locations: ['hospital_room'], dialogue: '...mình mệt quá...', facing: 'down', sitting: true },
+    { id: 'patient2', name: 'Bệnh Nhân B', x: 27, y: 8, color: 'bg-slate-400', locations: ['hospital_room'], dialogue: 'Đầu mình đau như búa bổ, không nghĩ được gì cả.', facing: 'down', sitting: true },
+    // Thư viện
+    { id: 'librarian1', name: 'Quản thư', x: 10, y: 4, color: 'bg-amber-600', locations: ['library_room'], dialogue: 'Suỵt! Giữ im lặng trong thư viện nhé các em.', facing: 'down' },
+    { id: 'lib_student', name: 'Học Sinh', x: 5, y: 8, color: 'bg-emerald-500', locations: ['library_room'], dialogue: 'Sách này hay ghê, ước gì mình có nhiều thời gian rảnh hơn để đọc.', facing: 'up', sitting: true }
   ],
   nearbyNpc: null,
   activeDialogue: null,

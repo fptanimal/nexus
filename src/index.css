@@ -8,13 +8,13 @@
   --font-pixel: "Fredoka", system-ui, sans-serif;
   --font-sans: "Quicksand", system-ui, sans-serif;
 
-  /* Retro Dark Palette (HSL-based) */
-  --color-bg-deep: hsl(240 30% 6%);
-  --color-bg-base: hsl(235 25% 10%);
-  --color-bg-surface: hsl(230 22% 14%);
-  --color-bg-elevated: hsl(228 20% 18%);
-  --color-border: hsl(230 15% 22%);
-  --color-border-light: hsl(230 12% 28%);
+  /* Retro Healing Palette (Pony Town Inspired - Soft warm & pastel) */
+  --color-bg-deep: hsl(125 15% 18%);
+  --color-bg-base: hsl(125 12% 22%);
+  --color-bg-surface: hsl(125 12% 26%);
+  --color-bg-elevated: hsl(125 15% 32%);
+  --color-border: hsl(100 20% 45%);
+  --color-border-light: hsl(100 25% 55%);
 
   /* Text */
   --color-text-primary: hsl(210 20% 90%);
