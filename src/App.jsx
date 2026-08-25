@@ -12,6 +12,7 @@ import TitleScreen from './components/TitleScreen';
 import LibraryModal from './components/LibraryModal';
 import SchoolModal from './components/SchoolModal';
 import HospitalModal from './components/HospitalModal';
+import FoodModal from './components/FoodModal';
 import SoundController from './components/SoundController';
 import TilesetViewer from './components/TilesetViewer';
 import audioSystem from './utils/audioSystem';
@@ -34,9 +35,6 @@ export default function App() {
 
   const startGame = useGameStore(state => state.startGame);
   const timeLimit = useGameStore(state => state.timeLimit);
-  const inGameTime = useGameStore(state => state.inGameTime);
-  const currentDay = useGameStore(state => state.currentDay);
-  const currentChapter = useGameStore(state => state.currentChapter);
   const currentLocation = useGameStore(state => state.currentLocation);
   const changeLocation = useGameStore(state => state.changeLocation);
   const endGame = useGameStore(state => state.endGame);
@@ -52,15 +50,12 @@ export default function App() {
   const rest = useGameStore(state => state.rest);
   const advanceTime = useGameStore(state => state.advanceTime);
   const addJournalEntry = useGameStore(state => state.addJournalEntry);
-  const getSchedule = useGameStore(state => state.getSchedule);
   const tickTime = useGameStore(state => state.tickTime);
 
   const [showBreathing, setShowBreathing] = useState(false);
   const [showGrounding, setShowGrounding] = useState(false);
   const [titleFlicker, setTitleFlicker] = useState(true);
   const [isOverloaded, setIsOverloaded] = useState(false);
-
-  const schedule = getSchedule();
 
   // Real-time ticking logic
   useEffect(() => {
@@ -126,20 +121,8 @@ export default function App() {
     );
   }
 
-  // ── GAME SCREEN ───────────────────────────────────────
-  const formatTime = (minutes) => {
-    const h = Math.floor(minutes / 60) % 24;
-    const m = Math.floor(minutes % 60);
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-  };
-
   const isHighlyStressed = stress > 80;
   const isLowEnergy = energy < 20;
-
-  // Can perform actions based on schedule
-  const canStudy = ['class_am', 'class_pm', 'evening', 'night', 'late_night'].includes(schedule.event);
-  const canSocialize = ['lunch', 'free', 'evening'].includes(schedule.event);
-  const canRest = true;
 
   return (
     <div className={`flex w-full h-screen overflow-hidden ${isOverloaded ? 'overload-effect pointer-events-none' : isHighlyStressed ? 'glitch-effect' : ''}`}
@@ -148,37 +131,7 @@ export default function App() {
       {/* ── LEFT SIDEBAR ── */}
       <div className="sidebar w-60 flex flex-col z-10 overflow-y-auto">
         
-        {/* Header + Time */}
-        <div className="sidebar-section text-center">
-          <h2 className="font-pixel text-xs title-glow" style={{ color: 'var(--color-accent)', letterSpacing: '0.2em' }}>
-            OVERLOAD
-          </h2>
-          <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
-            Chương {currentChapter} · Ngày {currentDay}
-          </p>
-          <div className="mt-2 font-mono text-lg py-1 rounded text-glow-energy"
-               style={{ 
-                 color: 'var(--color-energy)', 
-                 background: 'var(--color-bg-deep)', 
-                 border: '1px solid var(--color-border)' 
-               }}>
-            {formatTime(inGameTime)}
-          </div>
-        </div>
-
-        {/* Schedule Bar */}
-        <div className="sidebar-section">
-          <p className="sidebar-label">Lịch trình</p>
-          <div className="flex items-center gap-2 px-1 py-1.5 rounded"
-            style={{ 
-              background: 'var(--color-bg-deep)', 
-              border: '1px solid var(--color-border)',
-              fontSize: '11px',
-              color: 'var(--color-text-secondary)'
-            }}>
-            <span>{schedule.label}</span>
-          </div>
-        </div>
+        <SidebarTimeAndSchedule />
 
         {/* Stats */}
         <div className="sidebar-section">
@@ -253,8 +206,10 @@ export default function App() {
             <LibraryModal />
             <SchoolModal />
             <HospitalModal />
+            {/* Screen Effects */}
           </>
         )}
+        <FoodModal />
         <IntrusiveThought />
         {showBreathing && <BreathingGame onClose={handleCloseBreathing} />}
         {showGrounding && <GroundingGame onClose={() => setShowGrounding(false)} />}
@@ -283,5 +238,56 @@ function StatBar({ icon, label, value, type, isWarning }) {
         <div className={`stat-bar-fill ${type}`} style={{ width: `${Math.min(100, value)}%` }}></div>
       </div>
     </div>
+  );
+}
+
+// ── SIDEBAR TIME & SCHEDULE ───────────────────────────────
+function SidebarTimeAndSchedule() {
+  const inGameTime = useGameStore(state => state.inGameTime);
+  const currentDay = useGameStore(state => state.currentDay);
+  const currentChapter = useGameStore(state => state.currentChapter);
+  const getSchedule = useGameStore(state => state.getSchedule);
+  const schedule = getSchedule();
+
+  const formatTime = (minutes) => {
+    const h = Math.floor(minutes / 60) % 24;
+    const m = Math.floor(minutes % 60);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <>
+      {/* Header + Time */}
+      <div className="sidebar-section text-center">
+        <h2 className="font-pixel text-xs title-glow" style={{ color: 'var(--color-accent)', letterSpacing: '0.2em' }}>
+          OVERLOAD
+        </h2>
+        <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+          Chương {currentChapter} · Ngày {currentDay}
+        </p>
+        <div className="mt-2 font-mono text-lg py-1 rounded text-glow-energy"
+             style={{ 
+               color: 'var(--color-energy)', 
+               background: 'var(--color-bg-deep)', 
+               border: '1px solid var(--color-border)' 
+             }}>
+          {formatTime(inGameTime)}
+        </div>
+      </div>
+
+      {/* Schedule Bar */}
+      <div className="sidebar-section">
+        <p className="sidebar-label">Lịch trình</p>
+        <div className="flex items-center gap-2 px-1 py-1.5 rounded"
+          style={{ 
+            background: 'var(--color-bg-deep)', 
+            border: '1px solid var(--color-border)',
+            fontSize: '11px',
+            color: 'var(--color-text-secondary)'
+          }}>
+          <span>{schedule.label}</span>
+        </div>
+      </div>
+    </>
   );
 }

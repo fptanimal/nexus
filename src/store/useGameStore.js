@@ -36,23 +36,12 @@ const MAPS = {
     for (let r = 0; r < rows; r++) { m[r][0] = 1; m[r][cols-1] = 1; }
 
     // --- KHU VỰC NHÀ Ở (Góc trái) ---
-    // Phòng ngủ: cột 0..9, hàng 0..11
-    for (let r = 0; r <= 11; r++) {
-      for (let c = 0; c <= 9; c++) {
-        if (r === 0 || r === 11 || c === 0 || c === 9) m[r][c] = 1; // Tường
-        else m[r][c] = 0; // Sàn phòng
+    // Ngôi nhà (ngoại thất): cột 1..8, hàng 4..11
+    for (let r = 4; r <= 11; r++) {
+      for (let c = 1; c <= 8; c++) {
+        m[r][c] = 9; // Invisible wall (Tòa nhà)
       }
     }
-    // Cửa phòng ngủ
-    m[11][4] = 0; m[11][5] = 0;
-
-    // Khối va chạm cho đồ đạc trong phòng ngủ (bao trọn để không đi xuyên qua được)
-    // Cây (x=1..2, y=1..2)
-    m[1][1] = 2; m[1][2] = 2; m[2][1] = 2; m[2][2] = 2; 
-    // Bàn + Laptop (x=3..8, y=0..3)
-    for(let r=0; r<4; r++) for(let c=3; c<9; c++) m[r][c] = 2; 
-    // Giường (x=4..7, y=6..9)
-    for(let r=6; r<10; r++) for(let c=4; c<8; c++) m[r][c] = 2;
 
     // Sân trước nhà
     for (let r = 12; r <= 15; r++) {
@@ -97,13 +86,7 @@ const MAPS = {
       m[16][c] = 5;
     }
 
-    // Khối va chạm (tường vô hình) của toà nhà trường học (thu nhỏ lại)
-    // Toà nhà nằm ở cột 18-26, hàng 4-10
-    for (let r = 4; r <= 10; r++) {
-      for (let c = 18; c <= 26; c++) {
-        m[r][c] = 9; // Invisible wall
-      }
-    }
+    // (Đã xóa Khối va chạm toà nhà trường học theo yêu cầu)
 
     // --- KHU VỰC THƯ VIỆN (Góc phải) ---
     // Khuôn viên thư viện nhỏ lại
@@ -121,16 +104,7 @@ const MAPS = {
     // Cổng vào thư viện
     m[16][36] = 5; m[16][37] = 5; m[16][38] = 5;
 
-    // Khối va chạm toà nhà thư viện (cột 34-40, hàng 7-14)
-    for (let r = 7; r <= 14; r++) {
-      for (let c = 34; c <= 40; c++) {
-        // Để trống khu vực cửa (hàng 14, cột 36-38) để nhân vật có thể đứng sát cửa
-        if (r === 14 && (c === 36 || c === 37 || c === 38)) {
-          continue;
-        }
-        m[r][c] = 9; // Invisible wall
-      }
-    }
+    // (Đã xóa Khối va chạm toà nhà thư viện theo yêu cầu)
 
     // Cây trong sân thư viện
     m[6][33] = 4; m[6][41] = 4; m[15][33] = 4; m[15][41] = 4;
@@ -162,19 +136,179 @@ const MAPS = {
     m[23][12] = 5; m[23][13] = 5;
     m[24][12] = 5; m[24][13] = 5;
 
-    // Khối va chạm tòa nhà Bệnh viện (cột 17-25, hàng 20-26)
-    for (let r = 20; r <= 26; r++) {
-      for (let c = 17; c <= 25; c++) {
-        // Cửa bệnh viện ở bên trái
-        if (c === 17 && (r === 23 || r === 24)) {
-           continue;
-        }
-        m[r][c] = 9; // Invisible wall (Tòa nhà)
-      }
-    }
+    // (Đã xóa Khối va chạm tòa nhà Bệnh viện theo yêu cầu)
+
     // Thêm cây xanh cho bệnh viện
     m[19][16] = 4; m[27][16] = 4; m[27][26] = 4;
 
+    return m;
+  })(),
+  bedroom: (() => {
+    const rows = 12;
+    const cols = 10;
+    const m = Array(rows).fill(null).map(() => Array(cols).fill(0));
+    for (let c = 0; c < cols; c++) { m[0][c] = 1; m[rows-1][c] = 1; }
+    for (let r = 0; r < rows; r++) { m[r][0] = 1; m[r][cols-1] = 1; }
+    m[11][4] = 0; m[11][5] = 0; // Cửa ra vào
+    m[1][1] = 2; m[1][2] = 2; m[2][1] = 2; m[2][2] = 2; 
+    for(let r=0; r<4; r++) for(let c=3; c<9; c++) m[r][c] = 2; 
+    for(let r=6; r<10; r++) for(let c=4; c<8; c++) m[r][c] = 2;
+    return m;
+  })(),
+  home: (() => {
+    const rows = 24;
+    const cols = 32;
+    const m = Array(rows).fill(null).map(() => Array(cols).fill(0));
+    // Tường bao quanh ngoài cùng
+    for (let c = 0; c < cols; c++) { m[0][c] = 1; m[rows-1][c] = 1; }
+    for (let r = 0; r < rows; r++) { m[r][0] = 1; m[r][cols-1] = 1; }
+    // Vách ngăn ngang (tách trên dưới) tại hàng 12
+    for (let c = 1; c < cols-1; c++) { if (c !== 8 && c !== 9 && c !== 22 && c !== 23) m[12][c] = 1; }
+    // Vách ngăn dọc 1 (tách Ngủ và Tắm ở trên) tại cột 16
+    for (let r = 1; r < 12; r++) { if (r !== 6 && r !== 7) m[r][16] = 1; }
+    // Vách ngăn dọc 2 (tách Bếp và Khách ở dưới) tại cột 14
+    for (let r = 13; r < rows-1; r++) { if (r !== 18 && r !== 19) m[r][14] = 1; }
+    // Cửa ra ngoài (ở phòng khách, cạnh dưới)
+    m[23][22] = 0; m[23][23] = 0; m[23][24] = 0;
+    // Bố trí nội thất (chặn di chuyển):
+    // Ngủ (Bedroom) dựa theo SVG gốc:
+    for (let r=6; r<=9; r++) for (let c=4; c<=7; c++) m[r][c] = 2; // Giường (x=4, y=6, w=4, h=4)
+    for (let r=1; r<=3; r++) for (let c=3; c<=8; c++) m[r][c] = 2; // Bàn PC (x=3, y=0 -> hitbox bắt đầu từ r=1, dài c=3..8)
+    for (let r=1; r<=2; r++) for (let c=1; c<=2; c++) m[r][c] = 2; // Chậu cây (x=1, y=1, w=2, h=2)
+    // Tắm:
+    for (let r=2; r<=5; r++) for (let c=25; c<=30; c++) m[r][c] = 2; // Bồn tắm
+    // Bếp:
+    for (let r=14; r<=18; r++) for (let c=1; c<=3; c++) m[r][c] = 2; // Tủ lạnh
+    for (let r=17; r<=19; r++) for (let c=6; c<=9; c++) m[r][c] = 2; // Bàn ăn
+    // Khách:
+    for (let r=18; r<=20; r++) for (let c=17; c<=20; c++) m[r][c] = 2; // Sofa
+    for (let r=15; r<=16; r++) for (let c=23; c<=25; c++) m[r][c] = 2; // Kệ TV
+    for (let r=13; r<=13; r++) for (let c=20; c<=21; c++) m[r][c] = 2; // Kệ sách
+    for (let r=14; r<=15; r++) for (let c=27; c<=28; c++) m[r][c] = 2; // Cây cảnh lớn
+    return m;
+  })(),
+  classroom: (() => {
+    const rows = 30;
+    const cols = 40;
+    const m = Array(rows).fill(null).map(() => Array(cols).fill(0));
+    // Tường bao
+    for (let c = 0; c < cols; c++) { m[0][c] = 1; m[rows-1][c] = 1; }
+    for (let r = 0; r < rows; r++) { m[r][0] = 1; m[r][cols-1] = 1; }
+    
+    // Hành lang giữa (Từ cột 18 đến 21)
+    // Tường bên trái hành lang
+    for(let r = 1; r < rows-1; r++) { m[r][17] = 1; }
+    // Tường bên phải hành lang
+    for(let r = 1; r < rows-1; r++) { m[r][22] = 1; }
+    
+    // Chia khu vực bên phải làm 2 phòng (Giáo viên ở trên, Vệ sinh ở dưới)
+    for(let c = 23; c < cols-1; c++) { m[16][c] = 1; }
+
+    // Cửa chính ra ngoài
+    m[rows-1][19] = 0; m[rows-1][20] = 0;
+    
+    // Cửa vào Lớp học (bên trái)
+    m[25][17] = 0; m[26][17] = 0;
+    
+    // Cửa vào Phòng Giáo viên (bên phải, phía trên)
+    m[14][22] = 0; m[15][22] = 0;
+    
+    // Cửa vào Nhà vệ sinh (bên phải, phía dưới)
+    m[18][22] = 0; m[19][22] = 0;
+
+    // --- NỘI THẤT ---
+    
+    // 1. LỚP HỌC (c: 1->16, r: 1->28)
+    // Bảng đen (Khối va chạm)
+    for(let c=4; c<=13; c++) { m[1][c] = 9; }
+    // Cây cảnh góc lớp (Khối va chạm)
+    m[1][1] = 9; m[1][16] = 9; m[28][1] = 9; m[28][16] = 9;
+    // Bục giảng toàn khối (Khối va chạm không cho học sinh bước lên)
+    for(let r=2; r<=5; r++) {
+      for(let c=4; c<=13; c++) {
+        m[r][c] = 9;
+      }
+    }
+    // Bàn học sinh (5 hàng x 2 dãy bàn lớn)
+    for(let r=9; r<=25; r+=4) { 
+      // Dãy trái
+      m[r][3]=9; m[r][4]=9; m[r][5]=9; m[r][6]=9;
+      // Dãy phải
+      m[r][11]=9; m[r][12]=9; m[r][13]=9; m[r][14]=9;
+    }
+    
+    // 2. PHÒNG GIÁO VIÊN (c: 23->38, r: 1->15)
+    // Tủ tài liệu áp tường trên
+    for(let c=24; c<=31; c++) { m[1][c] = 9; }
+    // Bình nước
+    m[1][37] = 9; m[1][38] = 9;
+    // Bàn làm việc (2 bàn)
+    for(let r=4; r<=6; r++) {
+      m[r][24]=9; m[r][25]=9; m[r][26]=9;
+      m[r][30]=9; m[r][31]=9; m[r][32]=9;
+    }
+    // Sofa tiếp khách góc dưới phải
+    for(let r=11; r<=13; r++) { for(let c=34; c<=37; c++) { m[r][c] = 9; } }
+    // Cây cảnh
+    m[13][24] = 9; m[13][25] = 9;
+    
+    // 3. NHÀ VỆ SINH (c: 23->38, r: 17->28)
+    // Tường gương và bồn rửa
+    for(let c=26; c<=30; c++) { 
+      m[17][c] = 9; // Gương
+      m[18][c] = 9; // Lavabo
+    }
+    // Buồng vệ sinh (Toilet stalls)
+    for(let c=24; c<=36; c++) {
+       m[23][c] = 9; // Lưng buồng
+       if (c % 2 === 0) {
+           m[24][c] = 9; m[25][c] = 9; // Vách ngăn 2 bên
+       }
+    }
+    // Cửa đóng cho một số buồng
+    m[25][27] = 9;
+    m[25][31] = 9;
+
+    return m;
+  })(),
+  hospital_room: (() => {
+    const rows = 24;
+    const cols = 32;
+    const m = Array(rows).fill(null).map(() => Array(cols).fill(0));
+    // Tường bao
+    for (let c = 0; c < cols; c++) { m[0][c] = 1; m[rows-1][c] = 1; }
+    for (let r = 0; r < rows; r++) { m[r][0] = 1; m[r][cols-1] = 1; }
+    
+    // Vách ngăn phòng (Phòng cấp cứu bên trái, phòng hồi sức bên phải)
+    // (Đã xóa vách ngăn và cửa trong phòng theo yêu cầu)
+
+    // Cửa chính
+    m[23][15] = 0; m[23][16] = 0; 
+    
+    // Quầy lễ tân (Reception)
+    for(let c=13; c<=18; c++) { m[18][c] = 2; m[19][c] = 2; }
+    
+    // Giường bệnh (2x2 blocks) trong các phòng
+    // Phòng trên trái
+    for(let r=2; r<=4; r+=2) { m[r][2]=2; m[r+1][2]=2; m[r][3]=2; m[r+1][3]=2; m[r][6]=2; m[r+1][6]=2; m[r][7]=2; m[r+1][7]=2;}
+    // Phòng dưới trái
+    for(let r=10; r<=12; r+=2) { m[r][2]=2; m[r+1][2]=2; m[r][3]=2; m[r+1][3]=2; m[r][6]=2; m[r+1][6]=2; m[r][7]=2; m[r+1][7]=2;}
+    // Phòng trên phải
+    for(let r=2; r<=4; r+=2) { m[r][24]=2; m[r+1][24]=2; m[r][25]=2; m[r+1][25]=2; m[r][28]=2; m[r+1][28]=2; m[r][29]=2; m[r+1][29]=2;}
+    // Phòng dưới phải
+    for(let r=10; r<=12; r+=2) { m[r][24]=2; m[r+1][24]=2; m[r][25]=2; m[r+1][25]=2; m[r][28]=2; m[r+1][28]=2; m[r][29]=2; m[r+1][29]=2;}
+    
+    return m;
+  })(),
+  library_room: (() => {
+    const rows = 15;
+    const cols = 20;
+    const m = Array(rows).fill(null).map(() => Array(cols).fill(0));
+    for (let c = 0; c < cols; c++) { m[0][c] = 1; m[rows-1][c] = 1; }
+    for (let r = 0; r < rows; r++) { m[r][0] = 1; m[r][cols-1] = 1; }
+    m[14][9] = 0; m[14][10] = 0; // Cửa
+    for(let c=8; c<=11; c++) { m[2][c] = 2; m[3][c] = 2; } // Bàn
+    for(let r=5; r<=11; r+=3) { for(let c=2; c<=12; c+=5) { m[r][c]=2; m[r][c+1]=2; m[r+1][c]=2; m[r+1][c+1]=2; } } // Kệ sách
     return m;
   })()
 };
@@ -205,18 +339,19 @@ const useGameStore = create((set, get) => ({
   sfxVolume: 0.4,
 
   // ── Location System ──
-  currentLocation: 'main',
+  currentLocation: 'home',
   
   // ── Player Position ──
-  playerPos: { x: 5, y: 5 },
+  playerPos: { x: 23, y: 20 },
 
-  // ── NPCs (rải rác trên main map) ──
+  // ── NPC System ──
   npcs: [
-    { id: 'minh', name: 'Minh', x: 20, y: 6, color: 'bg-amber-400', locations: ['main'] },
-    { id: 'ha', name: 'Hà', x: 14, y: 15, color: 'bg-pink-400', locations: ['main'] },
-    { id: 'tuan', name: 'Tuấn', x: 25, y: 10, color: 'bg-blue-400', locations: ['main'] },
-    { id: 'linh', name: 'Linh', x: 18, y: 15, color: 'bg-purple-400', locations: ['main'] }
+    { id: 'teacher1', name: 'Cô Giáo', x: 8, y: 3, color: 'bg-indigo-500', locations: ['classroom'], dialogue: 'Các em chú ý nghe giảng nhé! Đừng nói chuyện riêng.', facing: 'down' },
+    { id: 'student1', name: 'Nam', x: 4, y: 10, color: 'bg-green-500', locations: ['classroom'], dialogue: 'Trời ơi, bài toán này khó quá đi mất...', facing: 'up', sitting: true },
+    { id: 'student2', name: 'Hoa', x: 12, y: 14, color: 'bg-yellow-400', locations: ['classroom'], dialogue: 'Cậu làm xong bài chưa? Cho tớ chép với!', facing: 'up', sitting: true },
+    { id: 'student3', name: 'Tuấn', x: 6, y: 22, color: 'bg-red-400', locations: ['classroom'], dialogue: 'Tối nay về chơi game không? Tớ rảnh lắm!', facing: 'up', sitting: true }
   ],
+  nearbyNpc: null,
   activeDialogue: null,
 
   // ── Journal ──
@@ -239,6 +374,17 @@ const useGameStore = create((set, get) => ({
   isHospitalModalOpen: false,
   openHospitalModal: () => set({ isHospitalModalOpen: true }),
   closeHospitalModal: () => set({ isHospitalModalOpen: false }),
+
+  // --- FOOD MENU ---
+  isFoodMenuOpen: false,
+  foodMenuSource: 'fridge',
+  openFoodMenu: (source = 'fridge') => set({ isFoodMenuOpen: true, foodMenuSource: source }),
+  closeFoodMenu: () => set({ isFoodMenuOpen: false }),
+  eatFood: (food) => set(state => ({
+    energy: Math.min(100, state.energy + food.energy),
+    stressLevel: Math.max(0, state.stressLevel + food.stress),
+    isFoodMenuOpen: false
+  })),
   attendTherapy: () => set((state) => {
     // 15 mins
     return {
@@ -301,9 +447,10 @@ const useGameStore = create((set, get) => ({
     const time = state.inGameTime % 1440;
     const visible = [...state.npcs];
     
-    // Đã gỡ bỏ sự xuất hiện của ba và mẹ theo yêu cầu của người chơi
+    // Ba mẹ xuất hiện sau 19:00 (7 PM)
     if (time >= 19 * 60 || time < 7 * 60) {
-      // visible.push( ... );
+      visible.push({ id: 'ba', name: 'Ba', x: 23, y: 15, color: 'bg-gray-400', locations: ['home'], dialogue: 'Học bài đi con, đừng chơi game muộn quá nhé.' });
+      visible.push({ id: 'me', name: 'Mẹ', x: 6, y: 15, color: 'bg-pink-400', locations: ['home'], dialogue: 'Xuống ăn cơm đi con, mẹ nấu xong rồi đây.' });
     }
     return visible;
   },
@@ -324,8 +471,8 @@ const useGameStore = create((set, get) => ({
       timeLimit: mins, 
       inGameTime: 7 * 60,
       currentDay: 1,
-      currentLocation: 'main',
-      playerPos: { x: 3, y: 7, facing: 'down' },
+      currentLocation: 'home',
+      playerPos: { x: 23, y: 20, facing: 'up' },
       
       // Trạng thái trị liệu
       intrusiveThought: null
@@ -483,9 +630,9 @@ const useGameStore = create((set, get) => ({
     return get()._addTime(inGameMinsPerSec);
   }),
 
-  changeLocation: (location) => set({
+  changeLocation: (location, customPos) => set({
     currentLocation: location,
-    playerPos: { x: 10, y: 8, facing: 'down' }
+    playerPos: customPos || { x: 10, y: 8, facing: 'down' }
   }),
 
   speakOut: () => set((state) => {
@@ -502,6 +649,18 @@ const useGameStore = create((set, get) => ({
     ...get()._addTime(15),
     stress: Math.max(0, state.stress - 15),
     energy: Math.min(state.maxEnergy, state.energy + 5)
+  })),
+
+  eat: () => set((state) => ({
+    ...get()._addTime(20),
+    energy: Math.min(state.maxEnergy, state.energy + 30),
+    stress: Math.max(0, state.stress - 5)
+  })),
+
+  shower: () => set((state) => ({
+    ...get()._addTime(20),
+    stress: Math.max(0, state.stress - 25),
+    energy: Math.min(state.maxEnergy, state.energy + 10)
   })),
 
   startDialogue: (npcId) => set({ activeDialogue: npcId }),
@@ -524,6 +683,23 @@ const useGameStore = create((set, get) => ({
     stress: Math.max(0, state.stress - amount)
   })),
 
+  washFace: () => set(state => {
+    return {
+      hygiene: Math.min(100, state.hygiene + 20),
+      stress: Math.max(0, state.stress - 5),
+      energy: Math.min(100, state.energy + 5)
+    };
+  }),
+
+  useToilet: () => set(state => {
+    return {
+      hygiene: Math.min(100, state.hygiene + 15),
+      energy: Math.min(100, state.energy + 5)
+    };
+  }),
+
+  openHospitalModal: () => set({ isHospitalModalOpen: true }),
+
   waterPlant: () => set((state) => {
     if (state.plantWatered) return {};
     return {
@@ -531,7 +707,7 @@ const useGameStore = create((set, get) => ({
       plantHealth: Math.min(100, state.plantHealth + 15),
       lastWateredDay: state.currentDay,
       stress: Math.max(0, state.stress - 3),
-      playerDecisions: [...state.playerDecisions, 'watered_plant']
+      playerDecisions: [...(state.playerDecisions || []), 'watered_plant']
     };
   }),
 

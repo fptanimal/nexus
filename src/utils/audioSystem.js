@@ -186,6 +186,43 @@ class AudioSystem {
     osc.stop(now + 0.22);
   }
 
+  // School Bell (Ding-dong-ding-dong)
+  playSchoolBell() {
+    if (!this.ctx || this.isMuted) return;
+    const now = this.ctx.currentTime;
+    
+    // Westminister Quarters pattern notes
+    const notes = [
+      { freq: 659.25, time: 0 }, // E5
+      { freq: 523.25, time: 0.5 }, // C5
+      { freq: 587.33, time: 1.0 }, // D5
+      { freq: 392.00, time: 1.5 }, // G4
+      { freq: 392.00, time: 2.5 }, // G4
+      { freq: 587.33, time: 3.0 }, // D5
+      { freq: 659.25, time: 3.5 }, // E5
+      { freq: 523.25, time: 4.0 }  // C5
+    ];
+
+    notes.forEach(note => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(note.freq, now + note.time);
+
+      // Bell envelope
+      gain.gain.setValueAtTime(0, now + note.time);
+      gain.gain.linearRampToValueAtTime(0.6, now + note.time + 0.05); // Sharp attack
+      gain.gain.exponentialRampToValueAtTime(0.01, now + note.time + 2.0); // Long decay
+
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+
+      osc.start(now + note.time);
+      osc.stop(now + note.time + 2.5);
+    });
+  }
+
   // ── MP3 BGM ENGINE ─────────────────────────
 
   startBGM(index = null) {
