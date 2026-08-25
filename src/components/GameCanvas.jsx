@@ -1579,44 +1579,18 @@ export default function GameCanvas() {
          ctx.fillStyle = '#f8fafc'; ctx.fillRect(rx + 6 * tileSize, ry + 4, 16, 20); // Giấy tờ
          ctx.fillStyle = '#475569'; fillRoundRect(rx + 7.2 * tileSize, ry - 1.5 * tileSize, 14, 18, 2); // Máy POS
          ctx.fillStyle = '#22c55e'; ctx.fillRect(rx + 7.2 * tileSize + 3, ry - 1.5 * tileSize + 3, 8, 8); // POS screen
-         
-         // NPC BÁC SĨ (To hơn) tại c=16.5, r=16.5
-         const docX = 16.5 * tileSize, docY = 16.5 * tileSize;
-         ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 8;
-         ctx.fillStyle = '#fcd34d'; fillRoundRect(docX - 8, docY - 18, 16, 16, 4); // Mặt to
-         ctx.fillStyle = '#374151'; fillRoundRect(docX - 9, docY - 20, 18, 8, 4); // Tóc
-         ctx.fillRect(docX - 9, docY - 12, 4, 6); // Tóc mai
-         ctx.fillRect(docX + 5, docY - 12, 4, 6); 
-         // Thân (Áo Blouse trắng)
-         ctx.fillStyle = '#ffffff'; fillRoundRect(docX - 10, docY - 2, 20, 18, 4); // Áo
-         ctx.fillStyle = '#e2e8f0'; ctx.fillRect(docX - 5, docY - 2, 10, 18); // Nếp gấp áo giữa
-         // Cà vạt / Áo trong
-         ctx.fillStyle = '#38bdf8'; ctx.fillRect(docX - 3, docY - 2, 6, 8); // Áo trong
-         // Ống nghe (Stethoscope) to hơn
-         ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 2; 
-         ctx.beginPath(); ctx.arc(docX, docY, 7, 0, Math.PI, false); ctx.stroke();
-         ctx.beginPath(); ctx.moveTo(docX + 6, docY + 2); ctx.lineTo(docX + 6, docY + 12); ctx.stroke();
-         ctx.shadowColor = 'transparent';
-
-         // Biển báo lớn treo tường to hơn
-         ctx.fillStyle = '#e2e8f0'; fillRoundRect(rx + 2 * tileSize, ry - 4.5 * tileSize, 5 * tileSize, 1.5 * tileSize, 2);
-         ctx.strokeStyle = '#475569'; ctx.strokeRect(rx + 2 * tileSize, ry - 4.5 * tileSize, 5 * tileSize, 1.5 * tileSize);
-         ctx.fillStyle = '#000000'; ctx.font = 'bold 11px Arial';
-         ctx.fillText('KHU THANH TOÁN', rx + 2.5 * tileSize, ry - 3.7 * tileSize);
-         ctx.fillText('& HÀNH CHÍNH', rx + 2.7 * tileSize, ry - 3.2 * tileSize);
-
-         // Ghế đẩu tròn (Stools) to hơn
+         // Ghế đẩu tròn (Stools)
          const drawStool = (x, y, color) => {
            ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 4;
-           ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI*2); ctx.fill();
+           ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, 10, 0, Math.PI*2); ctx.fill();
            ctx.shadowColor = 'transparent';
-           ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.stroke();
+           ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.stroke();
          };
-         drawStool(rx + 2.5 * tileSize, ry + 3 * tileSize, '#22c55e');
-         drawStool(rx + 4 * tileSize, ry + 3 * tileSize, '#3b82f6');
-         drawStool(rx + 5.5 * tileSize, ry + 3 * tileSize, '#22c55e');
+         drawStool(rx + 2.5 * tileSize, ry + 2 * tileSize, '#22c55e');
+         drawStool(rx + 4 * tileSize, ry + 2 * tileSize, '#3b82f6');
+         drawStool(rx + 5.5 * tileSize, ry + 2 * tileSize, '#22c55e');
 
-         // 3. TỦ THUỐC KÍNH (To hơn) r=13..21, c=28..30
+         // 3. TỦ THUỐC KÍNH
          const cabX = 28 * tileSize, cabY = 12 * tileSize, cabW = 3 * tileSize, cabH = 9 * tileSize;
          ctx.fillStyle = '#475569'; ctx.fillRect(cabX, cabY, cabW, cabH);
          ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 3;
@@ -1630,24 +1604,24 @@ export default function GameCanvas() {
          drawMed(cabX + 12, cabY + 7 * tileSize, 32, 18, '#ffffff'); drawMed(cabX + 54, cabY + 6.5 * tileSize, 16, 24, '#3b82f6');
          ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.fillRect(cabX, cabY, cabW, cabH); // Mặt kính
          
-         // 4. HÀM VẼ GIƯỜNG BỆNH KHỔNG LỒ (6x3 tiles)
+         // 4. HÀM VẼ GIƯỜNG BỆNH (3x2 tiles)
          const drawHorizontalBedScale = (c, r) => {
            const bx = c * tileSize, by = r * tileSize;
-           const bw = 6 * tileSize, bh = 3 * tileSize;
+           const bw = 3 * tileSize, bh = 2 * tileSize;
            
            // Nệm trắng
-           ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 6;
-           ctx.fillStyle = '#ffffff'; fillRoundRect(bx, by + 6, bw, bh - 12, 4);
-           ctx.strokeStyle = '#475569'; ctx.lineWidth = 3; ctx.strokeRect(bx, by + 6, bw, bh - 12);
+           ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 4;
+           ctx.fillStyle = '#ffffff'; fillRoundRect(bx, by + 4, bw, bh - 8, 4);
+           ctx.strokeStyle = '#475569'; ctx.lineWidth = 2; ctx.strokeRect(bx, by + 4, bw, bh - 8);
            ctx.shadowColor = 'transparent';
            
            // Ga trải giường Xanh Biển Tươi - Phủ nửa phải giường
-           ctx.fillStyle = '#2563eb'; ctx.fillRect(bx + 2 * tileSize, by + 8, bw - 2 * tileSize - 2, bh - 16);
-           ctx.strokeStyle = '#1d4ed8'; ctx.strokeRect(bx + 2 * tileSize, by + 8, bw - 2 * tileSize - 2, bh - 16);
+           ctx.fillStyle = '#2563eb'; ctx.fillRect(bx + 1.2 * tileSize, by + 6, bw - 1.2 * tileSize - 2, bh - 12);
+           ctx.strokeStyle = '#1d4ed8'; ctx.strokeRect(bx + 1.2 * tileSize, by + 6, bw - 1.2 * tileSize - 2, bh - 12);
            
-           // Gối trắng (Bên Trái to hơn)
-           ctx.fillStyle = '#f8fafc'; fillRoundRect(bx + 12, by + 16, 32, bh - 32, 6);
-           ctx.strokeStyle = '#94a3b8'; ctx.strokeRect(bx + 12, by + 16, 32, bh - 32);
+           // Gối trắng
+           ctx.fillStyle = '#f8fafc'; fillRoundRect(bx + 6, by + 8, 18, bh - 16, 4);
+           ctx.strokeStyle = '#94a3b8'; ctx.strokeRect(bx + 6, by + 8, 18, bh - 16);
            
            // Máy đo điện tâm đồ (Monitor khổng lồ) - Góc trên trái
            ctx.fillStyle = '#0f172a'; fillRoundRect(bx - 6, by - 14, 24, 20, 3);
@@ -3042,8 +3016,8 @@ export default function GameCanvas() {
         }
       }
       else if (currentLocation === 'hospital_room') {
-        if (pGridX >= 12 && pGridX <= 19 && pGridY >= 17 && pGridY <= 20) fObj = { type: 'doctor_desk', label: 'Khám bệnh' };
-        else if (pGridX >= 2 && pGridX <= 7 && pGridY >= 14 && pGridY <= 17) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ' };
+        if (pGridX >= 14 && pGridX <= 21 && pGridY >= 17 && pGridY <= 20) fObj = { type: 'doctor_desk', label: 'Khám bệnh' };
+        else if (pGridX >= 2 && pGridX <= 4 && pGridY >= 14 && pGridY <= 15) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ' };
         else if (pGridX >= 13 && pGridX <= 18 && pGridY >= 21) fObj = { type: 'door', label: '[E] Ra ngoài' };
       }
       else if (currentLocation === 'library_room') {

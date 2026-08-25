@@ -296,10 +296,10 @@ const MAPS = {
     for (let c = 14; c <= 21; c++) m[18][c] = 2; // Bàn ngang (r=18)
     m[15][21] = 2; m[16][21] = 2; m[17][21] = 2; // Cạnh dọc của L
     
-    // Giường bệnh nằm ngang (Scale up: 6x3 blocks)
+    // Giường bệnh nằm ngang (Scale up: 3x2 blocks)
     const placeHorizontalBed = (startC, startR) => {
-      for(let r=startR; r<=startR+2; r++) {
-        for(let c=startC; c<=startC+5; c++) {
+      for(let r=startR; r<=startR+1; r++) {
+        for(let c=startC; c<=startC+2; c++) {
           m[r][c] = 2;
         }
       }
@@ -373,9 +373,9 @@ const useGameStore = create((set, get) => ({
     { id: 'student2', name: 'Hoa', x: 12, y: 14, color: 'bg-yellow-400', locations: ['classroom'], dialogue: 'Cậu làm xong bài chưa? Cho tớ chép với!', facing: 'up', sitting: true },
     { id: 'student3', name: 'Tuấn', x: 6, y: 22, color: 'bg-red-400', locations: ['classroom'], dialogue: 'Tối nay về chơi game không? Tớ rảnh lắm!', facing: 'up', sitting: true },
     // Bệnh viện
-    { id: 'doctor1', name: 'BS. Tâm Lý', x: 18, y: 17, color: 'bg-sky-400', locations: ['hospital_room'], dialogue: 'Chào bạn, dạo này bạn có thấy áp lực quá không? Cứ bình tĩnh ngồi xuống đây nhé.', facing: 'down' },
-    { id: 'patient1', name: 'Bệnh Nhân A', x: 5, y: 3, color: 'bg-slate-400', locations: ['hospital_room'], dialogue: '...mình mệt quá...', facing: 'down', sitting: true },
-    { id: 'patient2', name: 'Bệnh Nhân B', x: 27, y: 8, color: 'bg-slate-400', locations: ['hospital_room'], dialogue: 'Đầu mình đau như búa bổ, không nghĩ được gì cả.', facing: 'down', sitting: true },
+    { id: 'doctor1', name: 'BS. Tâm Lý', x: 18, y: 17, color: 'bg-sky-400', locations: ['hospital_room'], dialogue: 'Chào bạn, dạo này bạn có thấy áp lực quá không? Nhấn phím Tương tác vào bàn để khám bệnh nhé.', facing: 'down' },
+    { id: 'patient1', name: 'Bệnh Nhân A', x: 3, y: 2, color: 'bg-slate-400', locations: ['hospital_room'], dialogue: '...mình mệt quá...', facing: 'down', sitting: true },
+    { id: 'patient2', name: 'Bệnh Nhân B', x: 25, y: 7, color: 'bg-slate-400', locations: ['hospital_room'], dialogue: 'Đầu mình đau như búa bổ, không nghĩ được gì cả.', facing: 'down', sitting: true },
     // Thư viện
     { id: 'librarian1', name: 'Quản thư', x: 10, y: 4, color: 'bg-amber-600', locations: ['library_room'], dialogue: 'Suỵt! Giữ im lặng trong thư viện nhé các em.', facing: 'down' },
     { id: 'lib_student', name: 'Học Sinh', x: 5, y: 8, color: 'bg-emerald-500', locations: ['library_room'], dialogue: 'Sách này hay ghê, ước gì mình có nhiều thời gian rảnh hơn để đọc.', facing: 'up', sitting: true }
