@@ -1455,13 +1455,30 @@ export default function GameCanvas() {
          ctx.fillStyle = '#1e3a8a'; // Xanh biển đậm sang trọng
          ctx.fillRect(33 * tileSize, 10 * tileSize, 6 * tileSize, 5 * tileSize);
 
-         // Sàn nhà vệ sinh (Gạch lục giác/sọc vuông nhỏ)
-         ctx.fillStyle = '#dbeafe'; // Xanh nhạt mát mẻ
+         // Sàn nhà vệ sinh (Gạch lục giác/sọc vuông nhỏ) - Cập nhật gạch lục giác sáng bóng
+         ctx.fillStyle = '#f0fdf4'; // Trắng ánh xanh nhẹ ngọc bích
          ctx.fillRect(23 * tileSize, 17 * tileSize, 16 * tileSize, 12 * tileSize);
-         ctx.fillStyle = 'rgba(255,255,255,0.3)';
-         for(let r=17; r<29; r++) {
-           for(let c=23; c<39; c++) {
-             if ((r+c)%2===0) ctx.fillRect(c*tileSize, r*tileSize, tileSize, tileSize);
+         
+         ctx.lineWidth = 1;
+         for(let r=17; r<=28; r++) {
+           for(let c=23; c<=38; c++) {
+             // Vẽ vân đá marble
+             ctx.fillStyle = ((r+c)%2===0) ? 'rgba(56, 189, 248, 0.05)' : 'rgba(0, 0, 0, 0.02)';
+             ctx.fillRect(c*tileSize, r*tileSize, tileSize, tileSize);
+             
+             // Viền gạch tinh tế bóng bẩy
+             ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+             ctx.strokeRect(c*tileSize, r*tileSize, tileSize, tileSize);
+             
+             // Phản chiếu ánh sáng (Glow nhẹ)
+             if ((r+c)%3===0) {
+               ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+               ctx.beginPath();
+               ctx.moveTo(c*tileSize + 2, r*tileSize + 2);
+               ctx.lineTo(c*tileSize + 12, r*tileSize + 2);
+               ctx.lineTo(c*tileSize + 2, r*tileSize + 12);
+               ctx.fill();
+             }
            }
          }
 
@@ -1552,42 +1569,86 @@ export default function GameCanvas() {
          ctx.fillStyle = 'rgba(56, 189, 248, 0.8)'; fillRoundRect(wx + 2, wy + 4, 12, 12, 4);
          ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fillRect(wx + 4, wy + 2, 2, 10); // Reflection
 
-         // Bồn rửa & Gương (Nhà vệ sinh)
-         ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(25 * tileSize, 19.5 * tileSize, 6 * tileSize, 6);
-         ctx.fillStyle = '#e2e8f0'; ctx.fillRect(25 * tileSize, 18.5 * tileSize, 6 * tileSize, tileSize);
+         // Bồn rửa & Gương (Nhà vệ sinh) - Nâng cấp bồn đá hoa cương & gương LED
+         const sinkX = 25 * tileSize, sinkY = 17 * tileSize;
+         // Đế đá hoa cương xám đen
+         ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 8;
+         ctx.fillStyle = '#1e293b'; fillRoundRect(sinkX, sinkY + 1.5 * tileSize, 6 * tileSize, tileSize, 4);
+         ctx.shadowColor = 'transparent';
          
-         // Khung Gương (Bắt buộc phải có để hiển thị khung phản chiếu)
-         ctx.fillStyle = '#94a3b8'; ctx.fillRect(26 * tileSize, 17 * tileSize, 5 * tileSize, tileSize); 
-         ctx.fillStyle = '#e0f2fe'; ctx.fillRect(26 * tileSize + 2, 17 * tileSize + 2, 5 * tileSize - 4, tileSize - 4); 
-         ctx.fillStyle = 'rgba(255,255,255,0.5)';
-         ctx.beginPath(); ctx.moveTo(27 * tileSize, 17 * tileSize + 2); ctx.lineTo(30 * tileSize, 17 * tileSize + 2); ctx.lineTo(26 * tileSize + 2, 18 * tileSize - 2); ctx.lineTo(26 * tileSize + 2, 17 * tileSize + 20); ctx.fill(); 
+         // Mặt bàn vân đá
+         ctx.fillStyle = '#334155'; fillRoundRect(sinkX + 2, sinkY + 1.5 * tileSize + 2, 6 * tileSize - 4, tileSize - 4, 2);
+         ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fillRect(sinkX + 4, sinkY + 1.5 * tileSize + 4, 6 * tileSize - 8, 4); // Highlight
+
+         // Khung Gương LED cảm ứng
+         ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 10; // Hắt sáng LED xanh quanh gương
+         ctx.fillStyle = '#f8fafc'; fillRoundRect(sinkX + tileSize, sinkY - 4, 4 * tileSize, 1.2 * tileSize, 6); 
+         ctx.shadowColor = 'transparent';
          
-         // Máy sấy tay (Nhà vệ sinh)
-         ctx.fillStyle = '#cbd5e1'; fillRoundRect(31.2 * tileSize, 18.2 * tileSize, 20, 24, 4);
-         ctx.fillStyle = '#64748b'; fillRoundRect(31.2 * tileSize + 4, 18.2 * tileSize + 20, 12, 4, 2); // Khe gió
+         // Mặt gương phản chiếu
+         ctx.fillStyle = '#e0f2fe'; fillRoundRect(sinkX + tileSize + 2, sinkY - 2, 4 * tileSize - 4, 1.2 * tileSize - 4, 4); 
+         ctx.fillStyle = 'rgba(255,255,255,0.6)';
+         ctx.beginPath(); ctx.moveTo(sinkX + 1.5 * tileSize, sinkY - 2); ctx.lineTo(sinkX + 3.5 * tileSize, sinkY - 2); 
+         ctx.lineTo(sinkX + tileSize + 2, sinkY + 1 * tileSize - 6); ctx.lineTo(sinkX + tileSize + 2, sinkY + 0.5 * tileSize); ctx.fill(); 
          
-         // Thùng rác (Nhà vệ sinh)
-         ctx.fillStyle = '#0f172a'; fillRoundRect(23.5 * tileSize, 19 * tileSize, 20, 24, 4);
-         ctx.fillStyle = '#334155'; ctx.fillRect(23.5 * tileSize + 2, 19 * tileSize - 2, 16, 4);
-         
-         for(let i=0; i<5; i++) {
-            ctx.beginPath(); ctx.ellipse((25.5 + i) * tileSize + 8, 19 * tileSize + 4, 12, 6, 0, 0, Math.PI * 2); 
-            ctx.fillStyle = '#f8fafc'; ctx.fill();
-            ctx.beginPath(); ctx.ellipse((25.5 + i) * tileSize + 8, 19 * tileSize + 4, 8, 4, 0, 0, Math.PI * 2); 
-            ctx.fillStyle = '#cbd5e1'; ctx.fill();
+         // Vòi nước mạ kim loại sáng bóng & bồn rửa chìm
+         for(let i=0; i<3; i++) {
+            const bx = sinkX + 1.2 * tileSize + i * 1.8 * tileSize;
+            // Lòng bồn chìm
+            ctx.fillStyle = '#94a3b8'; ctx.beginPath(); ctx.ellipse(bx, sinkY + 2 * tileSize, 12, 6, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(bx, sinkY + 2 * tileSize + 2, 2, 0, Math.PI * 2); ctx.fill(); // Lỗ thoát
+            // Vòi kim loại
+            ctx.fillStyle = '#cbd5e1'; ctx.fillRect(bx - 2, sinkY + 1.5 * tileSize, 4, 10); // Cổ vòi
+            ctx.fillRect(bx - 2, sinkY + 1.5 * tileSize + 4, 12, 3); // Đầu vòi vươn ra
+            ctx.fillStyle = '#f8fafc'; ctx.fillRect(bx - 1, sinkY + 1.5 * tileSize + 1, 2, 10); // Highlight chrome
          }
+         
+         // Bình xà phòng
+         ctx.fillStyle = '#10b981'; fillRoundRect(sinkX + 12, sinkY + 1.5 * tileSize + 4, 6, 12, 2); // Dung dịch xanh
+         ctx.fillStyle = '#94a3b8'; ctx.fillRect(sinkX + 14, sinkY + 1.5 * tileSize, 2, 4); ctx.fillRect(sinkX + 10, sinkY + 1.5 * tileSize, 6, 2);
 
-         // Toilet Stalls
-         // Lưng buồng
-         ctx.fillStyle = '#64748b'; 
-         ctx.fillRect(24 * tileSize, 23 * tileSize, 13 * tileSize, 10); 
-         ctx.fillStyle = '#94a3b8'; 
-         ctx.fillRect(24 * tileSize, 23 * tileSize + 10, 13 * tileSize, tileSize - 10); 
+         // Máy sấy tay Dyson mạ bạc (Nhà vệ sinh)
+         const hdX = 31.2 * tileSize, hdY = 18.2 * tileSize;
+         ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 6;
+         ctx.fillStyle = '#cbd5e1'; fillRoundRect(hdX, hdY, 20, 24, 6);
+         ctx.shadowColor = 'transparent';
+         ctx.fillStyle = '#f8fafc'; fillRoundRect(hdX + 2, hdY + 2, 6, 20, 2); // Highlight kim loại
+         ctx.fillStyle = '#1e293b'; fillRoundRect(hdX + 4, hdY + 18, 12, 4, 2); // Khe gió
+         ctx.fillStyle = '#38bdf8'; ctx.fillRect(hdX + 8, hdY + 24, 4, 4); // Đèn LED xanh cảm ứng sấy
+         
+         // Thùng rác inox hình trụ
+         const trX = 23.5 * tileSize, trY = 19 * tileSize;
+         ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 4;
+         ctx.fillStyle = '#64748b'; fillRoundRect(trX, trY, 20, 24, 4);
+         ctx.shadowColor = 'transparent';
+         ctx.fillStyle = '#cbd5e1'; ctx.fillRect(trX + 4, trY, 6, 24); // Phản chiếu inox
+         ctx.fillStyle = '#1e293b'; ctx.fillRect(trX, trY, 20, 4); // Nắp viền đen
+         ctx.fillStyle = '#94a3b8'; fillRoundRect(trX + 6, trY + 20, 8, 4, 2); // Chân đạp mở nắp
 
-         // Vách ngăn bên
+         // Toilet Stalls - Buồng Vệ Sinh (Chất liệu giả gỗ sang trọng)
+         // Khung đế nhôm chrome
+         ctx.fillStyle = '#cbd5e1'; ctx.fillRect(24 * tileSize, 23 * tileSize + tileSize - 4, 13 * tileSize, 4);
+         
+         // Vách ngăn & Cửa
          for(let c=24; c<=36; c+=2) {
-            ctx.fillStyle = '#cbd5e1'; 
-            ctx.fillRect(c * tileSize, 23 * tileSize + tileSize, tileSize, 2 * tileSize); 
+            // Cột vách ngăn
+            ctx.fillStyle = '#0f172a'; 
+            ctx.fillRect(c * tileSize, 23 * tileSize + tileSize, 6, 2 * tileSize); 
+            
+            // Cửa buồng gỗ xám
+            if (c < 36) {
+               ctx.fillStyle = '#334155'; fillRoundRect(c * tileSize + 8, 23 * tileSize + tileSize, 2 * tileSize - 10, 2 * tileSize, 2);
+               ctx.fillStyle = '#475569'; fillRoundRect(c * tileSize + 10, 23 * tileSize + tileSize + 2, 2 * tileSize - 14, 2 * tileSize - 4, 1);
+               
+               // Bản lề nhôm
+               ctx.fillStyle = '#cbd5e1'; ctx.fillRect(c * tileSize + 8, 23 * tileSize + tileSize + 8, 2, 6); ctx.fillRect(c * tileSize + 8, 23 * tileSize + tileSize + 20, 2, 6);
+               
+               // Tay nắm & Khóa Occupancy
+               ctx.fillStyle = '#94a3b8'; fillRoundRect(c * tileSize + 2 * tileSize - 8, 23 * tileSize + tileSize + 14, 4, 12, 2);
+               // Random indicator: Đỏ (Có người) hoặc Xanh (Trống)
+               ctx.fillStyle = (c % 4 === 0) ? '#ef4444' : '#10b981';
+               ctx.beginPath(); ctx.arc(c * tileSize + 2 * tileSize - 6, 23 * tileSize + tileSize + 10, 2, 0, Math.PI * 2); ctx.fill();
+            }
          }
          // === 3. VẼ BÀN HỌC & GHẾ ===
          const drawDesk = (x, y, style) => {
