@@ -432,7 +432,6 @@ const drawPlayerSprite = (ctx, img, w, h, x, y, isStressed) => {
 export default function GameCanvas() {
   const canvasRef = useRef(null);
   const promptRef = useRef(null);
-  const studyPromptRef = useRef(null);
   const mapWrapperRef = useRef(null);
   const activeAnimRef = useRef(null);
 
@@ -464,7 +463,7 @@ export default function GameCanvas() {
 
   // Phát tiếng trống trường
   useEffect(() => {
-    const isClassTime = schedule.event === 'class_am' || schedule.event === 'class_pm';
+    const isClassTime = schedule === 'class_am' || schedule.event === 'class_pm';
     if (isClassTime && lastBellEventRef.current !== schedule.event) {
       lastBellEventRef.current = schedule.event;
       if (currentLocation === 'classroom' || currentLocation === 'main') {
@@ -504,17 +503,15 @@ export default function GameCanvas() {
       }
       
       keysRef.current = { w: false, a: false, s: false, d: false }; // Stop movement
-      if (duration !== Infinity) {
-        setTimeout(() => {
-          if (activeAnimRef.current?.type === type) {
-            if (type === 'shower' && activeAnimRef.current.oldPos) {
-              posRef.current.x = activeAnimRef.current.oldPos.x;
-              posRef.current.y = activeAnimRef.current.oldPos.y;
-            }
-            activeAnimRef.current = null;
+      setTimeout(() => {
+        if (activeAnimRef.current?.type === type) {
+          if (type === 'shower' && activeAnimRef.current.oldPos) {
+            posRef.current.x = activeAnimRef.current.oldPos.x;
+            posRef.current.y = activeAnimRef.current.oldPos.y;
           }
-        }, duration);
-      }
+          activeAnimRef.current = null;
+        }
+      }, duration);
     };
   }, [currentLocation, initialPos]);
 
@@ -522,16 +519,9 @@ export default function GameCanvas() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
-      
-      const key = e.key.toLowerCase();
-      if (activeAnimRef.current) {
-        if (activeAnimRef.current.type === 'study' && key === 'e') {
-          activeAnimRef.current = null;
-        } else {
-          return; // Block input during animations
-        }
-      }
+      if (activeAnimRef.current) return; // Block input during animations
 
+      const key = e.key.toLowerCase();
       if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
         if (key === 'w' || key === 'arrowup') keysRef.current.w = true;
         if (key === 's' || key === 'arrowdown') keysRef.current.s = true;
@@ -601,7 +591,7 @@ export default function GameCanvas() {
                 posRef.current.x = (obj.gridX || Math.floor((posRef.current.x + 16) / tileSize)) * tileSize;
                 posRef.current.y = (obj.gridY || Math.floor((posRef.current.y + 16) / tileSize)) * tileSize; // Stand precisely below desk
                 posRef.current.facing = 'up';
-                window.triggerPlayerAnimation('study', Infinity);
+                window.triggerPlayerAnimation('study', 5000);
                 useGameStore.getState().study();
               }
             }
@@ -656,7 +646,7 @@ export default function GameCanvas() {
             posRef.current.x = (obj.gridX || Math.floor((posRef.current.x + 16) / tileSize)) * tileSize;
             posRef.current.y = (obj.gridY || Math.floor((posRef.current.y + 16) / tileSize)) * tileSize;
             posRef.current.facing = 'up';
-            window.triggerPlayerAnimation('study', Infinity);
+            window.triggerPlayerAnimation('study', 5000);
             useGameStore.getState().study();
           } else if (obj && obj.type === 'house_door') {
             audioSystem.playClick();
@@ -1556,7 +1546,7 @@ export default function GameCanvas() {
          for(let c=24; c<=36; c+=2) {
             ctx.fillStyle = '#cbd5e1'; 
             ctx.fillRect(c * tileSize, 23 * tileSize + tileSize, tileSize, 2 * tileSize); 
-         }
+            
          // === 3. VẼ BÀN HỌC & GHẾ ===
          const drawDesk = (x, y, style) => {
             // Đổ bóng chung cho cả bàn và ghế
@@ -1593,40 +1583,23 @@ export default function GameCanvas() {
                ctx.fillStyle = '#78350f'; ctx.beginPath(); ctx.arc(x + 4, y + 10, 2, 0, Math.PI*2); ctx.fill();
             } 
             else if (style === 'student') {
-               // Chân bàn và ghế (sắt sơn tĩnh điện)
-               ctx.fillStyle = '#64748b'; 
-               // Chân ghế
-               ctx.fillRect(x + 10, y + 26, 2, 8); ctx.fillRect(x + 20, y + 26, 2, 8);
-               // Chân bàn
-               ctx.fillRect(x + 2, y + 18, 2, 10); ctx.fillRect(x + 28, y + 18, 2, 10);
-               
-               // Mặt ghế gỗ
-               ctx.fillStyle = '#f59e0b'; // Gỗ vàng tranh
-               fillRoundRect(x + 8, y + 22, 16, 8, 2);
-               ctx.fillStyle = '#d97706'; ctx.fillRect(x + 8, y + 28, 16, 2); // Cạnh ghế
-               
-               // Lưng tựa ghế (gỗ cong)
-               ctx.fillStyle = '#f59e0b';
-               fillRoundRect(x + 9, y + 32, 14, 4, 2);
-               ctx.fillStyle = '#d97706'; ctx.fillRect(x + 9, y + 35, 14, 1);
-               
-               // Khung đỡ tựa lưng (sắt)
-               ctx.fillStyle = '#64748b';
-               ctx.fillRect(x + 11, y + 30, 2, 4); ctx.fillRect(x + 19, y + 30, 2, 4);
-
-               // Mặt bàn (Gỗ sáng)
-               ctx.shadowColor = 'rgba(0,0,0,0.3)';
-               ctx.fillStyle = '#fcd34d'; 
-               fillRoundRect(x, y + 2, 32, 20, 3);
+               // Ghế học sinh bằng gỗ chân sắt
+               ctx.fillStyle = 'rgba(0,0,0,0.3)'; fillRoundRect(x + 10, y + 26, 12, 4, 2); // Bóng ghế
                ctx.shadowColor = 'transparent';
+               ctx.fillStyle = '#94a3b8'; ctx.fillRect(x + 12, y + 20, 2, 8); ctx.fillRect(x + 18, y + 20, 2, 8); // Chân sắt
+               ctx.fillStyle = '#d97706'; fillRoundRect(x + 8, y + 18, 16, 10, 2); // Mặt ghế
+               ctx.fillStyle = '#b45309'; ctx.fillRect(x + 8, y + 18, 16, 2); // Nép ghế
+               ctx.fillStyle = '#b45309'; fillRoundRect(x + 10, y + 30, 12, 4, 1); // Lưng ghế tựa sau (vẽ đè lên)
+
+               // Mặt bàn học sinh
+               ctx.shadowColor = 'rgba(0,0,0,0.4)';
+               ctx.fillStyle = '#b45309'; fillRoundRect(x, y, 32, 22, 2);
+               ctx.shadowColor = 'transparent';
+               ctx.fillStyle = '#92400e'; ctx.fillRect(x, y + 18, 32, 4); // Cạnh bàn
                
-               // Cạnh bàn và viền
-               ctx.fillStyle = '#f59e0b'; ctx.fillRect(x, y + 20, 32, 3);
-               ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.fillRect(x, y + 2, 32, 2);
-               
-               // Ngăn bàn (hộc bàn) xám nhạt
-               ctx.fillStyle = '#475569';
-               ctx.fillRect(x + 2, y + 22, 28, 4);
+               // Vân gỗ bàn học
+               ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fillRect(x, y, 32, 2);
+               ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.beginPath(); ctx.moveTo(x+4, y+4); ctx.lineTo(x+28, y+8); ctx.stroke();
                
                // Ngẫu nhiên đặt đồ trên bàn (dựa vào x, y để pseudo-random)
                const hash = (x + y) % 3;
@@ -2535,14 +2508,8 @@ export default function GameCanvas() {
           
           if (activeAnimRef.current) {
             promptRef.current.style.opacity = '0';
-            if (activeAnimRef.current.type === 'study' && studyPromptRef.current) {
-               studyPromptRef.current.style.opacity = '1';
-            } else if (studyPromptRef.current) {
-               studyPromptRef.current.style.opacity = '0';
-            }
           } else {
             promptRef.current.style.opacity = ''; // Trả lại quyền điều khiển cho React class
-            if (studyPromptRef.current) studyPromptRef.current.style.opacity = '0';
           }
         }
       }
@@ -2699,26 +2666,6 @@ export default function GameCanvas() {
               border: '2px solid #60a5fa'
             }}>
             [SPACE] {nearbyObj ? nearbyObj.label : (nearbyNpc ? 'Nói chuyện' : '')}
-          </div>
-        </div>
-
-        {/* Study Prompt Overlay */}
-        <div
-          ref={studyPromptRef}
-          className="absolute top-24 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-opacity duration-200 opacity-0"
-        >
-          <div className="pixel-bounce whitespace-nowrap"
-            style={{
-              fontSize: '12px',
-              fontWeight: 800,
-              color: '#fff',
-              background: '#eab308',
-              padding: '6px 12px',
-              borderRadius: '4px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-              border: '2px solid #ca8a04'
-            }}>
-            [E] Rời khỏi bàn
           </div>
         </div>
 
