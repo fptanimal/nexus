@@ -1616,19 +1616,19 @@ export default function GameCanvas() {
 
                // Khung đỡ tựa lưng ghế
                ctx.fillStyle = '#3f3f46';
-               ctx.fillRect(x + 11, y + 26, 2, 12); ctx.fillRect(x + 19, y + 26, 2, 12);
+               ctx.fillRect(x + 11, y + 26, 2, 18); ctx.fillRect(x + 19, y + 26, 2, 18);
 
                // Mặt ghế gỗ
                ctx.shadowColor = 'rgba(0,0,0,0.4)';
                ctx.fillStyle = '#d97706';
-               ctx.fillRect(x + 8, y + 22, 16, 8); // Vuông vức
-               ctx.fillStyle = '#92400e'; ctx.fillRect(x + 8, y + 30, 16, 3); // Cạnh ghế
+               ctx.fillRect(x + 8, y + 28, 16, 8); // Vuông vức
+               ctx.fillStyle = '#92400e'; ctx.fillRect(x + 8, y + 36, 16, 3); // Cạnh ghế
                ctx.shadowColor = 'transparent';
                
                // Lưng tựa ghế
                ctx.fillStyle = '#d97706';
-               ctx.fillRect(x + 8, y + 34, 16, 6);
-               ctx.fillStyle = '#92400e'; ctx.fillRect(x + 8, y + 40, 16, 2);
+               ctx.fillRect(x + 8, y + 40, 16, 6);
+               ctx.fillStyle = '#92400e'; ctx.fillRect(x + 8, y + 46, 16, 2);
                
                // === ĐỒ VẬT CHI TIẾT TRÊN BÀN (CLUTTER) ===
                const hash = (x + y) % 3;
@@ -2038,7 +2038,7 @@ export default function GameCanvas() {
             // Vẽ thân người (ngồi lọt thỏm vào bàn giống ảnh)
             // Lưng áo xám nhạt và vai rộng
             ctx.fillStyle = '#9ca3af'; // Màu áo xám giống nhân vật
-            ctx.beginPath(); ctx.roundRect(-14, -10, 28, 30, 6); ctx.fill(); 
+            ctx.beginPath(); ctx.roundRect(-14, -10, 28, 36, 6); ctx.fill(); 
             
             // Cổ áo trắng
             ctx.fillStyle = '#f8fafc';
@@ -2070,8 +2070,8 @@ export default function GameCanvas() {
             
             // Vẽ LẠI tựa lưng ghế đè lên phần dưới lưng người để tạo cảm giác bị che khuất
             ctx.fillStyle = '#d97706';
-            ctx.fillRect(-8, 18, 16, 6); // Lưng tựa
-            ctx.fillStyle = '#92400e'; ctx.fillRect(-8, 24, 16, 2); // Cạnh lưng tựa
+            ctx.fillRect(-8, 24, 16, 6); // Lưng tựa
+            ctx.fillStyle = '#92400e'; ctx.fillRect(-8, 30, 16, 2); // Cạnh lưng tựa
             
             // Các ký hiệu bay bay (Toán...)
             if (t % 1000 < 500) {
