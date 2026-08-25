@@ -1546,7 +1546,7 @@ export default function GameCanvas() {
          for(let c=24; c<=36; c+=2) {
             ctx.fillStyle = '#cbd5e1'; 
             ctx.fillRect(c * tileSize, 23 * tileSize + tileSize, tileSize, 2 * tileSize); 
-            
+         }
          // === 3. VẼ BÀN HỌC & GHẾ ===
          const drawDesk = (x, y, style) => {
             // Đổ bóng chung cho cả bàn và ghế
@@ -2588,7 +2588,6 @@ export default function GameCanvas() {
       cancelAnimationFrame(animationFrameId);
       clearInterval(interactionPoll);
     };
-    }
   }, [mapData, currentLocation, getVisibleNpcs, schedule.event]);
 
   return (
