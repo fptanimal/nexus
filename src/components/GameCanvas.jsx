@@ -527,6 +527,7 @@ export default function GameCanvas() {
       if (activeAnimRef.current) {
         if (activeAnimRef.current.type === 'study' && key === 'e') {
           activeAnimRef.current = null;
+          return; // Prevent triggering another interaction immediately
         } else {
           return; // Block input during animations
         }
