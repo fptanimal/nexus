@@ -634,6 +634,10 @@ export default function GameCanvas() {
                 useGameStore.getState().openHospitalModal();
               } else if (obj.type === 'hospital_bed') {
                 audioSystem.playClick();
+                if (obj.gridX !== undefined && obj.gridY !== undefined) {
+                  posRef.current.x = obj.gridX * tileSize;
+                  posRef.current.y = obj.gridY * tileSize;
+                }
                 window.triggerPlayerAnimation('sleep', 10000);
                 useGameStore.getState().attendTherapy(); // Or some generic rest logic. Let's just do a custom state update.
                 useGameStore.setState(state => ({
@@ -725,6 +729,10 @@ export default function GameCanvas() {
             useGameStore.getState().openHospitalModal();
           } else if (obj && obj.type === 'hospital_bed') {
             audioSystem.playClick();
+            if (obj.gridX !== undefined && obj.gridY !== undefined) {
+              posRef.current.x = obj.gridX * tileSize;
+              posRef.current.y = obj.gridY * tileSize;
+            }
             window.triggerPlayerAnimation('sleep', 10000);
             useGameStore.setState(state => ({
                 energy: Math.min(100, state.energy + 20),
@@ -3017,10 +3025,10 @@ export default function GameCanvas() {
       }
       else if (currentLocation === 'hospital_room') {
         if (pGridX >= 14 && pGridX <= 21 && pGridY >= 17 && pGridY <= 20) fObj = { type: 'doctor_desk', label: 'Khám bệnh' };
-        else if (pGridX >= 2 && pGridX <= 4 && pGridY >= 14 && pGridY <= 15) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ' };
-        else if (pGridX >= 2 && pGridX <= 4 && pGridY >= 7 && pGridY <= 8) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ' };
-        else if (pGridX >= 2 && pGridX <= 4 && pGridY >= 19 && pGridY <= 20) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ' };
-        else if (pGridX >= 24 && pGridX <= 26 && pGridY >= 2 && pGridY <= 3) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ' };
+        else if (pGridX >= 2 && pGridX <= 4 && pGridY >= 14 && pGridY <= 15) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ', gridX: 3, gridY: 14 };
+        else if (pGridX >= 2 && pGridX <= 4 && pGridY >= 7 && pGridY <= 8) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ', gridX: 3, gridY: 7 };
+        else if (pGridX >= 2 && pGridX <= 4 && pGridY >= 19 && pGridY <= 20) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ', gridX: 3, gridY: 19 };
+        else if (pGridX >= 24 && pGridX <= 26 && pGridY >= 2 && pGridY <= 3) fObj = { type: 'hospital_bed', label: 'Nằm nghỉ', gridX: 25, gridY: 2 };
         else if (pGridX >= 13 && pGridX <= 18 && pGridY >= 21) fObj = { type: 'door', label: '[E] Ra ngoài' };
       }
       else if (currentLocation === 'library_room') {
