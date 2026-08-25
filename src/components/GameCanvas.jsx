@@ -644,8 +644,6 @@ export default function GameCanvas() {
                     energy: Math.min(100, state.energy + 20),
                     stress: Math.max(0, state.stress - 10)
                 }));
-                // Nằm xuống thì nói chuyện với bác sĩ cho ngầu!
-                useGameStore.getState().startDialogue('doctor1');
               } else if (obj.type === 'house_door') {
                 audioSystem.playClick();
                 useGameStore.getState().changeLocation('home', { x: 23.5, y: 22, facing: 'up' });
@@ -740,8 +738,6 @@ export default function GameCanvas() {
                 energy: Math.min(100, state.energy + 20),
                 stress: Math.max(0, state.stress - 10)
             }));
-            // Nằm xuống thì nói chuyện với bác sĩ cho ngầu!
-            useGameStore.getState().startDialogue('doctor1');
           } else if (obj && obj.type === 'hospital_door') {
             audioSystem.playClick();
             useGameStore.getState().changeLocation('hospital_room', { x: 9.5, y: 13, facing: 'up' });
