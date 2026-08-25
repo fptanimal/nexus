@@ -51,6 +51,41 @@ const NPC_DATA = {
     dialogue: 'Trời ơi bài tập hôm qua khó kinh khủng, tớ thức đến 2h sáng mới làm xong. Cậu làm hết chưa?',
     speakOutText: 'Tớ không làm nổi... Tớ cảm thấy mình đang bị quá tải mất rồi Linh ơi.',
     hideText: 'Lảng tránh: "À ừ... bài khó thật."'
+  },
+  doctor1: {
+    emoji: '👨‍⚕️',
+    name: 'BS. Tâm Lý',
+    dialogue: 'Chào bạn, dạo này bạn có thấy áp lực quá không? Hãy điền vào phiếu để tôi khám bệnh cho nhé.',
+    speakOutText: 'Bác sĩ ơi, cháu thấy kiệt sức quá... Cháu không thể tiếp tục được nữa.',
+    hideText: 'Mỉm cười gượng gạo: "Dạ, cháu vẫn ổn ạ."'
+  },
+  patient1: {
+    emoji: '🤕',
+    name: 'Bệnh Nhân A',
+    dialogue: '...mình mệt quá... cả đêm qua mình không ngủ được...',
+    speakOutText: 'Tớ hiểu cảm giác đó... Tớ cũng đang rất căng thẳng.',
+    hideText: 'Lặng lẽ quay đi: "Mong bạn sớm khỏe."'
+  },
+  patient2: {
+    emoji: '😵',
+    name: 'Bệnh Nhân B',
+    dialogue: 'Đầu mình đau như búa bổ, không nghĩ được gì cả.',
+    speakOutText: 'Chúng ta cùng cố gắng nhé, rồi mọi thứ sẽ ổn thôi.',
+    hideText: 'Nhìn ái ngại: "Trông bạn mệt mỏi quá."'
+  },
+  librarian1: {
+    emoji: '👩‍🏫',
+    name: 'Quản thư',
+    dialogue: 'Suỵt! Giữ im lặng trong thư viện nhé các em. Hãy tìm một góc yên tĩnh mà học.',
+    speakOutText: 'Cô ơi, em học mãi mà không vô... Em lo quá.',
+    hideText: 'Cúi đầu: "Dạ vâng ạ."'
+  },
+  lib_student: {
+    emoji: '🤓',
+    name: 'Học Sinh',
+    dialogue: 'Sách này hay ghê, ước gì mình có nhiều thời gian rảnh hơn để đọc.',
+    speakOutText: 'Cậu sướng thật đấy... Tớ chỉ mong có thời gian ngủ thôi.',
+    hideText: 'Gật đầu: "Ừ, sách hay lắm."'
   }
 };
 
