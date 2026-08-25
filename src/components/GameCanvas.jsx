@@ -2031,8 +2031,8 @@ export default function GameCanvas() {
         } else if (anim.type === 'study') {
             // Học bài (Ngồi ở bàn thật trong lớp học)
             ctx.save();
-            // Origin đặt tại vị trí người chơi đang đứng (dưới ghế 1 chút)
-            ctx.translate(pos.x + 16, pos.y + 16);
+            // Đặt origin tại tâm của bàn học (bàn nằm ở tile phía trên ghế)
+            ctx.translate(pos.x + 16, pos.y - 16);
             
             const dx = -16, dy = -48;
             
