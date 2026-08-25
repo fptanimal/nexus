@@ -2035,32 +2035,43 @@ export default function GameCanvas() {
             
             const dx = -16, dy = -48;
             
-            // Draw player first so they sit in front of the desk top
-            const customImg = window.customPlayerSprites && window.customPlayerSprites['playerUp'];
-            if (customImg && customImg.complete && customImg.width > 0) {
-              const drawW = 32;
-              const drawH = (customImg.height / customImg.width) * drawW;
-              drawPlayerSprite(ctx, customImg, drawW, drawH, -drawW / 2, -drawH - 32, isHighlyStressed);
-            }
+            // Vẽ thân người (ngồi lọt thỏm vào bàn giống ảnh)
+            // Lưng áo xám nhạt và vai rộng
+            ctx.fillStyle = '#9ca3af'; // Màu áo xám giống nhân vật
+            ctx.beginPath(); ctx.roundRect(-14, -10, 28, 30, 6); ctx.fill(); 
             
-            // Redraw Desk Top exactly like static student desk to cover player's legs
-            ctx.fillStyle = '#b46329'; ctx.beginPath(); ctx.roundRect(dx, dy, 32, 24, 3); ctx.fill();
-            ctx.fillStyle = '#8a481c'; ctx.fillRect(dx, dy + 20, 32, 4);
-            ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fillRect(dx + 1, dy + 1, 30, 2);
+            // Cổ áo trắng
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath(); ctx.roundRect(-10, -12, 20, 10, 3); ctx.fill();
             
-            // White paper on the left
-            ctx.fillStyle = '#f8fafc'; ctx.beginPath(); ctx.roundRect(dx + 4, dy + 10, 10, 12, 1); ctx.fill();
-            ctx.fillStyle = '#cbd5e1'; ctx.fillRect(dx + 8, dy + 10, 1, 12);
+            // Tay (cánh tay xám) đưa lên bàn
+            // Tay trái
+            ctx.beginPath(); ctx.roundRect(-17, -6, 8, 18, 4); ctx.fill();
+            // Tay phải
+            ctx.beginPath(); ctx.roundRect(9, -6, 8, 18, 4); ctx.fill();
             
-            // Blue book on the right
-            ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.roundRect(dx + 20, dy + 8, 6, 14, 2); ctx.fill();
-            ctx.fillStyle = '#0284c7'; ctx.fillRect(dx + 20, dy + 8, 2, 14);
+            // Bàn tay (màu da)
+            ctx.fillStyle = '#fcd34d'; 
+            ctx.beginPath(); ctx.arc(-13, -8, 4, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(13, -8, 4, 0, Math.PI*2); ctx.fill();
             
-            // Cây bút chì nhúc nhích (viết) trên tờ giấy trắng (dx + 4, dy + 10)
-            const writeX = -12 + (Math.floor(t / 100) % 5);
-            const writeY = -36 + (Math.floor(t / 150) % 3);
-            ctx.fillStyle = '#ffd700'; // Bút vàng
-            ctx.fillRect(writeX, writeY, 2, 6);
+            // Đầu (tóc đen)
+            ctx.fillStyle = '#111827';
+            ctx.beginPath(); ctx.arc(0, -14, 12, 0, Math.PI*2); ctx.fill();
+            // Highlight nhẹ ở tóc
+            ctx.fillStyle = '#374151'; 
+            ctx.fillRect(-6, -22, 4, 3);
+            
+            // Cây bút trên tay phải (đang cặm cụi viết)
+            const writeX = 11 + (Math.floor(t / 100) % 3);
+            const writeY = -14 + (Math.floor(t / 150) % 2);
+            ctx.fillStyle = '#1f2937'; ctx.fillRect(writeX, writeY-2, 1, 2); // Ngòi
+            ctx.fillStyle = '#ef4444'; ctx.fillRect(writeX, writeY, 2, 8); // Thân bút đỏ
+            
+            // Vẽ LẠI tựa lưng ghế đè lên phần dưới lưng người để tạo cảm giác bị che khuất
+            ctx.fillStyle = '#d97706';
+            ctx.fillRect(-8, 18, 16, 6); // Lưng tựa
+            ctx.fillStyle = '#92400e'; ctx.fillRect(-8, 24, 16, 2); // Cạnh lưng tựa
             
             // Các ký hiệu bay bay (Toán...)
             if (t % 1000 < 500) {
