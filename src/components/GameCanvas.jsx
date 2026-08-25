@@ -2589,7 +2589,7 @@ export default function GameCanvas() {
       clearInterval(interactionPoll);
     };
     }
-  }, [mapData, currentLocation, getVisibleNpcs]);
+  }, [mapData, currentLocation, getVisibleNpcs, schedule.event]);
 
   return (
     <div className="relative w-full h-full flex items-center justify-center p-4"
