@@ -568,6 +568,9 @@ export default function GameCanvas() {
         if (activeAnimRef.current.type === 'study' && key === 'e') {
           activeAnimRef.current = null;
           return; // Prevent triggering another interaction immediately
+        } else if (activeAnimRef.current.type === 'sleep' && ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+          // Cho phép thức dậy sớm bằng cách di chuyển
+          activeAnimRef.current = null;
         } else {
           return; // Block input during animations
         }
@@ -639,11 +642,8 @@ export default function GameCanvas() {
                   posRef.current.y = obj.gridY * tileSize;
                 }
                 window.triggerPlayerAnimation('sleep', 10000);
-                useGameStore.getState().attendTherapy(); 
-                useGameStore.setState(state => ({
-                    energy: Math.min(100, state.energy + 20),
-                    stress: Math.max(0, state.stress - 10)
-                }));
+                // Nằm xuống thì bác sĩ đến khám luôn
+                useGameStore.getState().openHospitalModal();
               } else if (obj.type === 'house_door') {
                 audioSystem.playClick();
                 useGameStore.getState().changeLocation('home', { x: 23.5, y: 22, facing: 'up' });
@@ -734,10 +734,8 @@ export default function GameCanvas() {
               posRef.current.y = obj.gridY * tileSize;
             }
             window.triggerPlayerAnimation('sleep', 10000);
-            useGameStore.setState(state => ({
-                energy: Math.min(100, state.energy + 20),
-                stress: Math.max(0, state.stress - 10)
-            }));
+            // Nằm xuống thì bác sĩ đến khám luôn
+            useGameStore.getState().openHospitalModal();
           } else if (obj && obj.type === 'hospital_door') {
             audioSystem.playClick();
             useGameStore.getState().changeLocation('hospital_room', { x: 9.5, y: 13, facing: 'up' });
