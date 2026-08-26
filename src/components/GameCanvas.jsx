@@ -2284,6 +2284,16 @@ export default function GameCanvas() {
           if (walkCycle === 1) spriteKey += 'Walk1';
           else if (walkCycle === 3) spriteKey += 'Walk2';
         }
+        
+        if (npc.customAiSprite) {
+          let aiFacing = npc.facing;
+          if (!npc.isWandering) {
+            // For non-wandering oscillating NPCs, use direction
+            aiFacing = direction > 0 ? 'right' : 'left';
+            if (npc.facing === 'up' || npc.facing === 'down') aiFacing = npc.facing;
+          }
+          spriteKey = 'doctor_' + aiFacing;
+        }
 
         const customImg = window.customPlayerSprites && window.customPlayerSprites[spriteKey];
 
@@ -2847,9 +2857,12 @@ export default function GameCanvas() {
             window.customPlayerSprites[key] = img;
           }
           
-          const docImg = new Image();
-          docImg.src = '/images/doctor_sprite.png';
-          window.customPlayerSprites['doctor_sprite'] = docImg;
+          const docFrames = ['down', 'up', 'left', 'right'];
+          for (const dir of docFrames) {
+            const img = new Image();
+            img.src = `/images/doctor_${dir}.png`;
+            window.customPlayerSprites['doctor_' + dir] = img;
+          }
         }
 
         const customImg = window.customPlayerSprites[spriteKey];
