@@ -2329,6 +2329,15 @@ export default function GameCanvas() {
           else if (npc.id === 'tuan') hueRotate = 180;
           else if (npc.id === 'khang') hueRotate = 110;
           else if (npc.id === 'linh') hueRotate = 50;
+          
+          if (npc.color) {
+            if (npc.color.includes('sky')) hueRotate = 180; // cyan
+            else if (npc.color.includes('pink')) hueRotate = 330; // pink
+            else if (npc.color.includes('green')) hueRotate = 90; // green
+            else if (npc.color.includes('yellow')) hueRotate = 45; // yellow
+            else if (npc.color.includes('red')) hueRotate = 0; // default/redish
+            else if (npc.color.includes('indigo')) hueRotate = 240; // indigo
+          }
 
           ctx.filter = `hue-rotate(${hueRotate}deg)`;
 
