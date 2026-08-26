@@ -374,6 +374,7 @@ const useGameStore = create((set, get) => ({
     { id: 'student3', name: 'Tuấn', x: 6, y: 22, color: 'bg-red-400', locations: ['classroom'], dialogue: 'Tối nay về chơi game không? Tớ rảnh lắm!', facing: 'up', sitting: true },
     // Bệnh viện
     { id: 'doctor1', name: 'BS. Tâm Lý', x: 18, y: 17, color: 'bg-sky-400', locations: ['hospital_room'], dialogue: 'Chào bạn, dạo này bạn có thấy áp lực quá không? Nhấn phím Tương tác vào bàn để khám bệnh nhé.', facing: 'down' },
+    { id: 'doctor2', name: 'BS. Tuần Tra', x: 10, y: 15, color: 'bg-white', locations: ['hospital_room'], dialogue: 'Mọi người cố gắng nghỉ ngơi nhé.', facing: 'down', spriteSheet: 'doctor_sprite', isWandering: true },
     { id: 'patient1', name: 'Bệnh Nhân A', x: 3, y: 2, color: 'bg-slate-400', locations: ['hospital_room'], dialogue: '...mình mệt quá...', facing: 'down', sitting: true },
     { id: 'patient2', name: 'Bệnh Nhân B', x: 25, y: 7, color: 'bg-slate-400', locations: ['hospital_room'], dialogue: 'Đầu mình đau như búa bổ, không nghĩ được gì cả.', facing: 'down', sitting: true },
     // Thư viện

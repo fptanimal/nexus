@@ -596,7 +596,11 @@ export default function GameCanvas() {
           setNearbyNpc(npc => {
             if (npc) {
               audioSystem.playClick();
-              startDialogue(npc.id);
+              if (npc.id === 'doctor1') {
+                useGameStore.getState().openHospitalModal();
+              } else {
+                startDialogue(npc.id);
+              }
             } else if (obj) {
               audioSystem.playClick();
               if (obj.type === 'pc') {
@@ -850,6 +854,52 @@ export default function GameCanvas() {
         keysRef.current = { w: false, a: false, s: false, d: false };
         useGameStore.getState().movePlayer(0, 1);
       }
+
+      // 1.5 Update NPC AI
+      const visibleNpcsForAi = useGameStore.getState().npcs;
+      visibleNpcsForAi.forEach(npc => {
+        if (npc.isWandering && npc.locations && npc.locations.includes(currentLocation)) {
+          if (!npc._ai) {
+             npc._ai = { state: 'idle', timer: Math.random() * 2000, targetX: npc.x, targetY: npc.y };
+          }
+          const ai = npc._ai;
+          if (ai.state === 'idle') {
+            ai.timer -= elapsed;
+            npc.walkTimer = 0;
+            if (ai.timer <= 0) {
+               ai.state = 'walking';
+               // Chọn một giường bệnh ngẫu nhiên
+               const beds = [{x: 4, y: 14}, {x: 4, y: 7}, {x: 4, y: 19}, {x: 23, y: 3}];
+               const target = beds[Math.floor(Math.random() * beds.length)];
+               ai.targetX = target.x;
+               ai.targetY = target.y;
+            }
+          } else if (ai.state === 'walking') {
+            const dx = ai.targetX - npc.x;
+            const dy = ai.targetY - npc.y;
+            const dist = Math.hypot(dx, dy);
+            
+            if (dist < 0.1) {
+               npc.x = ai.targetX;
+               npc.y = ai.targetY;
+               npc.facing = npc.x > 15 ? 'right' : 'left'; // Quay mặt vào giường
+               ai.state = 'idle';
+               ai.timer = 3000 + Math.random() * 4000;
+            } else {
+               const speed = 0.08;
+               npc.x += (dx / dist) * speed;
+               npc.y += (dy / dist) * speed;
+               npc.walkTimer = (npc.walkTimer || 0) + 0.15;
+               
+               if (Math.abs(dx) > Math.abs(dy)) {
+                 npc.facing = dx > 0 ? 'right' : 'left';
+               } else {
+                 npc.facing = dy > 0 ? 'down' : 'up';
+               }
+            }
+          }
+        }
+      });
 
       // 2. Render
       canvas.width = cols * tileSize;
@@ -2248,7 +2298,27 @@ export default function GameCanvas() {
         ctx.ellipse(0, 0, 10, 4, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        if (customImg && customImg.complete && customImg.width > 0) {
+        if (npc.spriteSheet) {
+          const sheetImg = window.customPlayerSprites && window.customPlayerSprites[npc.spriteSheet];
+          if (sheetImg && sheetImg.complete && sheetImg.width > 0) {
+            const frameW = sheetImg.width / 4;
+            const frameH = sheetImg.height / 4;
+            let row = 0;
+            if (npc.facing === 'left') row = 1;
+            else if (npc.facing === 'right') row = 2;
+            else if (npc.facing === 'up') row = 3;
+            
+            let col = 0; // stand
+            if (npc.walkTimer > 0) {
+              const cycle = Math.floor(npc.walkTimer) % 4;
+              col = cycle; // 0, 1, 2, 3
+            }
+            
+            const drawW = 32;
+            const drawH = (frameH / frameW) * drawW;
+            ctx.drawImage(sheetImg, col * frameW, row * frameH, frameW, frameH, -drawW / 2, 12 - drawH, drawW, drawH);
+          }
+        } else if (customImg && customImg.complete && customImg.width > 0) {
           const drawW = 32;
           const drawH = (customImg.height / customImg.width) * drawW;
 
@@ -2352,8 +2422,8 @@ export default function GameCanvas() {
       if (anim && (anim.type === 'sleep' || anim.type === 'read' || anim.type === 'study' || anim.type === 'code' || anim.type === 'pe' || anim.type === 'science' || anim.type === 'math' || anim.type === 'literature' || anim.type === 'english' || anim.type === 'history' || anim.type === 'eat' || anim.type === 'shower' || anim.type === 'wash_face' || anim.type === 'toilet')) {
         const t = performance.now() - anim.start;
         if (anim.type === 'sleep') {
-          const sleepX = 6.8 * tileSize; // Giữa đệm (bỏ qua viền trống bên trái của SVG)
-          const sleepY = 7.8 * tileSize; // Lùi xuống để nằm trên đệm/gối
+          const sleepX = currentLocation === 'hospital_room' ? pos.x + tileSize * 0.8 : 6.8 * tileSize; // Giữa đệm (bỏ qua viền trống bên trái của SVG)
+          const sleepY = currentLocation === 'hospital_room' ? pos.y + tileSize * 0.8 : 7.8 * tileSize; // Lùi xuống để nằm trên đệm/gối
 
           ctx.save();
           ctx.translate(sleepX, sleepY);
@@ -2767,6 +2837,10 @@ export default function GameCanvas() {
             img.src = `/${file}.png`;
             window.customPlayerSprites[key] = img;
           }
+          
+          const docImg = new Image();
+          docImg.src = '/images/doctor_sprite.jpg';
+          window.customPlayerSprites['doctor_sprite'] = docImg;
         }
 
         const customImg = window.customPlayerSprites[spriteKey];
