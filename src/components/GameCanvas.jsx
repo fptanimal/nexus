@@ -2267,12 +2267,14 @@ export default function GameCanvas() {
 
         // Color mapping
         let hexColor = '#fbbf24'; // amber
-        if (npc.color.includes('pink')) hexColor = '#f472b6';
-        else if (npc.color.includes('blue')) hexColor = '#60a5fa';
-        else if (npc.color.includes('green')) hexColor = '#4ade80';
-        else if (npc.color.includes('purple')) hexColor = '#c084fc';
-        else if (npc.color.includes('gray')) hexColor = '#4b5563';
-        else if (npc.color.includes('rose')) hexColor = '#f43f5e';
+        if (npc.color) {
+          if (npc.color.includes('pink')) hexColor = '#f472b6';
+          else if (npc.color.includes('blue')) hexColor = '#60a5fa';
+          else if (npc.color.includes('green')) hexColor = '#4ade80';
+          else if (npc.color.includes('purple')) hexColor = '#c084fc';
+          else if (npc.color.includes('gray')) hexColor = '#4b5563';
+          else if (npc.color.includes('rose')) hexColor = '#f43f5e';
+        }
 
         // Use the same sprite images as the player!
         let baseSprite = direction > 0 ? 'playerRight' : 'playerLeft';
