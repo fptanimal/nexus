@@ -568,8 +568,8 @@ export default function GameCanvas() {
         if (activeAnimRef.current.type === 'study' && key === 'e') {
           activeAnimRef.current = null;
           return; // Prevent triggering another interaction immediately
-        } else if (activeAnimRef.current.type === 'sleep' && ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
-          // Cho phép thức dậy sớm bằng cách di chuyển
+        } else if (activeAnimRef.current.type === 'sleep' && ['e', 'w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+          // Cho phép thức dậy sớm bằng cách nhấn E hoặc di chuyển
           activeAnimRef.current = null;
         } else {
           return; // Block input during animations
