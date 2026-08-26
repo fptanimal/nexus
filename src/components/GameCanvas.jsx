@@ -2839,7 +2839,7 @@ export default function GameCanvas() {
           }
           
           const docImg = new Image();
-          docImg.src = '/images/doctor_sprite.jpg';
+          docImg.src = '/images/doctor_sprite.png';
           window.customPlayerSprites['doctor_sprite'] = docImg;
         }
 
