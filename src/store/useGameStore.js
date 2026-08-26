@@ -372,8 +372,7 @@ const useGameStore = create((set, get) => ({
     { id: 'student1', name: 'Nam', x: 4, y: 10, color: 'bg-green-500', locations: ['classroom'], dialogue: 'Trời ơi, bài toán này khó quá đi mất...', facing: 'up', sitting: true },
     { id: 'student2', name: 'Hoa', x: 12, y: 14, color: 'bg-yellow-400', locations: ['classroom'], dialogue: 'Cậu làm xong bài chưa? Cho tớ chép với!', facing: 'up', sitting: true },
     { id: 'student3', name: 'Tuấn', x: 6, y: 22, color: 'bg-red-400', locations: ['classroom'], dialogue: 'Tối nay về chơi game không? Tớ rảnh lắm!', facing: 'up', sitting: true },
-    // Bệnh viện
-    { id: 'doctor', name: 'Bác Sĩ', x: 10, y: 15, locations: ['hospital_room'], dialogue: 'Chào bạn, dạo này bạn có thấy áp lực quá không? Cố gắng nghỉ ngơi nhé.', facing: 'down', customAiSprite: true, isWandering: true },
+    { id: 'doctor', name: 'Bác Sĩ', x: 10, y: 15, color: 'bg-white', locations: ['hospital_room'], dialogue: 'Chào bạn, dạo này bạn có thấy áp lực quá không? Cố gắng nghỉ ngơi nhé.', facing: 'down', customAiSprite: true, isWandering: true },
     { id: 'patient1', name: 'Bệnh Nhân A', x: 3, y: 2, color: 'bg-slate-400', locations: ['hospital_room'], dialogue: '...mình mệt quá...', facing: 'down', sitting: true },
     { id: 'patient2', name: 'Bệnh Nhân B', x: 25, y: 7, color: 'bg-slate-400', locations: ['hospital_room'], dialogue: 'Đầu mình đau như búa bổ, không nghĩ được gì cả.', facing: 'down', sitting: true },
     // Thư viện

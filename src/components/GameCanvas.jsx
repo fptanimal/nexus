@@ -2288,13 +2288,10 @@ export default function GameCanvas() {
         }
         
         if (npc.customAiSprite) {
-          let aiFacing = npc.facing;
-          if (!npc.isWandering) {
-            // For non-wandering oscillating NPCs, use direction
-            aiFacing = direction > 0 ? 'right' : 'left';
-            if (npc.facing === 'up' || npc.facing === 'down') aiFacing = npc.facing;
-          }
-          spriteKey = 'doctor_' + aiFacing;
+          spriteKey = spriteKey.replace('player', 'doctor_ai_');
+          // Example: playerDownWalk1 -> doctor_ai_DownWalk1
+          // But our keys are like: doctor_ai_downWalk1
+          spriteKey = spriteKey.replace('Down', 'down').replace('Up', 'up').replace('Left', 'left').replace('Right', 'right');
         }
 
         const customImg = window.customPlayerSprites && window.customPlayerSprites[spriteKey];
@@ -2858,12 +2855,24 @@ export default function GameCanvas() {
             img.src = `/${file}.png`;
             window.customPlayerSprites[key] = img;
           }
-          
-          const docFrames = ['down', 'up', 'left', 'right'];
-          for (const dir of docFrames) {
+          const docFrames = {
+            doctor_ai_down: 'doctor_ai_down',
+            doctor_ai_downWalk1: 'doctor_ai_down_walk1',
+            doctor_ai_downWalk2: 'doctor_ai_down_walk2',
+            doctor_ai_up: 'doctor_ai_up',
+            doctor_ai_upWalk1: 'doctor_ai_up_walk1',
+            doctor_ai_upWalk2: 'doctor_ai_up_walk2',
+            doctor_ai_left: 'doctor_ai_left',
+            doctor_ai_leftWalk1: 'doctor_ai_left_walk1',
+            doctor_ai_leftWalk2: 'doctor_ai_left_walk2',
+            doctor_ai_right: 'doctor_ai_right',
+            doctor_ai_rightWalk1: 'doctor_ai_right_walk1',
+            doctor_ai_rightWalk2: 'doctor_ai_right_walk2',
+          };
+          for (const [key, file] of Object.entries(docFrames)) {
             const img = new Image();
-            img.src = `/images/doctor_${dir}.png`;
-            window.customPlayerSprites['doctor_' + dir] = img;
+            img.src = `/images/${file}.png`;
+            window.customPlayerSprites[key] = img;
           }
         }
 
