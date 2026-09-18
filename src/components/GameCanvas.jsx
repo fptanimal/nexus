@@ -547,7 +547,7 @@ export default function GameCanvas() {
       if (duration !== Infinity) {
         setTimeout(() => {
           if (activeAnimRef.current?.type === type) {
-            if (type === 'shower' && activeAnimRef.current.oldPos) {
+            if ((type === 'shower' || type === 'sleep') && activeAnimRef.current.oldPos) {
               posRef.current.x = activeAnimRef.current.oldPos.x;
               posRef.current.y = activeAnimRef.current.oldPos.y;
             }
@@ -570,6 +570,10 @@ export default function GameCanvas() {
           return; // Prevent triggering another interaction immediately
         } else if (activeAnimRef.current.type === 'sleep' && ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
           // Cho phép thức dậy sớm bằng cách di chuyển
+          if (activeAnimRef.current.oldPos) {
+            posRef.current.x = activeAnimRef.current.oldPos.x;
+            posRef.current.y = activeAnimRef.current.oldPos.y;
+          }
           activeAnimRef.current = null;
         } else {
           return; // Block input during animations
