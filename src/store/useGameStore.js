@@ -345,6 +345,11 @@ const useGameStore = create((set, get) => ({
   academics: 70,
   selfEsteem: 100,
   authenticity: 0,
+  hygiene: 100,
+
+  // ── Debuffs ──
+  hasExhaustionDebuff: false,
+  exhaustionEndTime: 0,
 
   // ── Therapy State ──
   intrusiveThought: null,
@@ -503,7 +508,9 @@ const useGameStore = create((set, get) => ({
       playerPos: { x: 23, y: 20, facing: 'up' },
       
       // Trạng thái trị liệu
-      intrusiveThought: null
+      intrusiveThought: null,
+      hasExhaustionDebuff: false,
+      exhaustionEndTime: 0
     });
   },
 
@@ -546,7 +553,10 @@ const useGameStore = create((set, get) => ({
     // Wall or desk or invisible collision
     if (tile === 1 || tile === 2 || tile === 9) return { playerPos: { ...state.playerPos, facing } };
     
-    const energyCost = state.stress > 80 ? 0.5 : 0.1;
+    let energyCost = state.stress > 80 ? 0.5 : 0.1;
+    if (state.hasExhaustionDebuff) {
+       energyCost *= 1.5; // Tốn năng lượng gấp rưỡi nếu đang kiệt quệ
+    }
     
     // Logic Sinh Vật Xâm Nhập (Bà Tiên Tri) xuất hiện ngẫu nhiên khi di chuyển ở Chương 1+
     let newThought = state.intrusiveThought;
@@ -597,12 +607,19 @@ const useGameStore = create((set, get) => ({
       }, 0);
     }
     
+    // Xử lý debuff kiệt quệ
+    let newHasExhaustionDebuff = state.hasExhaustionDebuff;
+    if (newHasExhaustionDebuff && newTime >= state.exhaustionEndTime) {
+       newHasExhaustionDebuff = false; // Hết thời gian debuff
+    }
+
     return {
       inGameTime: newTime,
       currentDay: newDay,
       energy: newEnergy,
       plantWatered: newPlantWatered,
-      plantHealth: newPlantHealth
+      plantHealth: newPlantHealth,
+      hasExhaustionDebuff: newHasExhaustionDebuff
     };
   },
 
@@ -711,6 +728,11 @@ const useGameStore = create((set, get) => ({
     stress: Math.max(0, state.stress - amount)
   })),
 
+  applyExhaustionDebuff: () => set((state) => ({
+    hasExhaustionDebuff: true,
+    exhaustionEndTime: state.inGameTime + 120 // 2 tiếng trong game
+  })),
+
   washFace: () => set(state => {
     return {
       hygiene: Math.min(100, state.hygiene + 20),
@@ -722,7 +744,8 @@ const useGameStore = create((set, get) => ({
   useToilet: () => set(state => {
     return {
       hygiene: Math.min(100, state.hygiene + 15),
-      energy: Math.min(100, state.energy + 5)
+      energy: Math.min(100, state.energy + 5),
+      stress: Math.max(0, state.stress - 5)
     };
   }),
 

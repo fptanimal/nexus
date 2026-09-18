@@ -15,6 +15,7 @@ import HospitalModal from './components/HospitalModal';
 import FoodModal from './components/FoodModal';
 import SoundController from './components/SoundController';
 import TilesetViewer from './components/TilesetViewer';
+import OverloadStormGame from './components/OverloadStormGame';
 import audioSystem from './utils/audioSystem';
 import { initEngine } from './engine/CoreEngine';
 
@@ -54,6 +55,7 @@ export default function App() {
 
   const [showBreathing, setShowBreathing] = useState(false);
   const [showGrounding, setShowGrounding] = useState(false);
+  const [showOverloadStorm, setShowOverloadStorm] = useState(false);
   const [titleFlicker, setTitleFlicker] = useState(true);
   const [isOverloaded, setIsOverloaded] = useState(false);
 
@@ -77,25 +79,46 @@ export default function App() {
 
   // Overload state trigger
   useEffect(() => {
+    // Chỉ trigger khi stress >= 100 và CHƯA overloaded
     if (isPlaying && stress >= 100 && !isOverloaded) {
       setIsOverloaded(true);
       if (audioSystem.isPlayingBGM) {
-        audioSystem.stopBGM(); // Tắt nhạc lập tức tạo không khí nghẹt thở
+        audioSystem.stopBGM();
+      }
+      if (useGameStore.getState().soundEnabled) {
+        audioSystem.startOverloadAudio();
       }
       
-      // Delay 1.5s để người chơi cảm nhận sự quá tải trước khi ép thở
-      const t = setTimeout(() => {
-        setShowBreathing(true);
-      }, 1500);
-      return () => clearTimeout(t);
+      // Mở bão suy nghĩ tiêu cực thay vì bắt thở ngay
+      setShowOverloadStorm(true);
+      useGameStore.getState().addJournalEntry("Mọi thứ vỡ vụn... Mình không thể thở được. Tiếng ồn ở khắp nơi.");
+      useGameStore.getState().addCatMessage('cat', 'T-thở đ...i! Nh-nhìn v-vào tớ n-này!!!');
     }
   }, [stress, isPlaying, isOverloaded]);
+
+  const handleOverloadWin = () => {
+    setShowOverloadStorm(false);
+    setShowBreathing(true); // Thắng thì được chuyển qua game thở để bình tĩnh
+  };
+
+  const handleOverloadFail = () => {
+    setShowOverloadStorm(false);
+    audioSystem.stopOverloadAudio();
+    if (useGameStore.getState().soundEnabled) {
+      audioSystem.playError();
+      audioSystem.startBGM();
+    }
+    useGameStore.getState().applyExhaustionDebuff();
+    useGameStore.getState().decreaseStress(30); // Giảm một chút để không bị lặp ngay, nhưng bị debuff
+    setIsOverloaded(false);
+  };
 
   const handleCloseBreathing = () => {
     setShowBreathing(false);
     if (isOverloaded) {
       useGameStore.getState().decreaseStress(50); // Giảm stress sau khi thở xong
       setIsOverloaded(false);
+      audioSystem.stopOverloadAudio();
       if (useGameStore.getState().soundEnabled) {
         audioSystem.startBGM(); // Bật lại nhạc
       }
@@ -211,6 +234,7 @@ export default function App() {
         )}
         <FoodModal />
         <IntrusiveThought />
+        {showOverloadStorm && <OverloadStormGame onWin={handleOverloadWin} onFail={handleOverloadFail} />}
         {showBreathing && <BreathingGame onClose={handleCloseBreathing} />}
         {showGrounding && <GroundingGame onClose={() => setShowGrounding(false)} />}
       </div>

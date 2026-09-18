@@ -261,6 +261,75 @@ class AudioSystem {
     this.currentLocation = location;
     this.stressLevel = stress;
   }
+
+  // ── OVERLOAD AUDIO ENGINE ─────────────────────────
+  startOverloadAudio() {
+    if (!this.ctx || this.isMuted) return;
+    this.stopOverloadAudio(); // clear previous if any
+
+    const now = this.ctx.currentTime;
+    
+    // 1. Tinnitus (High pitched ringing)
+    this.tinnitusOsc = this.ctx.createOscillator();
+    this.tinnitusGain = this.ctx.createGain();
+    this.tinnitusOsc.type = 'sine';
+    this.tinnitusOsc.frequency.value = 6000; // 6kHz ringing
+    this.tinnitusGain.gain.setValueAtTime(0, now);
+    this.tinnitusGain.gain.linearRampToValueAtTime(0.05, now + 2); // fade in slowly
+    
+    this.tinnitusOsc.connect(this.tinnitusGain);
+    this.tinnitusGain.connect(this.sfxGain);
+    this.tinnitusOsc.start();
+
+    // 2. Heartbeat (Low thumping)
+    this.isPlayingHeartbeat = true;
+    this.playHeartbeat(now);
+  }
+
+  playHeartbeat(time) {
+    if (!this.isPlayingHeartbeat || !this.ctx) return;
+
+    // Create a low thud
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(60, time); // Low pitch
+    osc.frequency.exponentialRampToValueAtTime(30, time + 0.1); // Drop pitch
+    
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(0.8, time + 0.05); // Attack
+    gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3); // Decay
+
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+    
+    osc.start(time);
+    osc.stop(time + 0.4);
+
+    // Schedule next beat (speeding up slightly could be done here, but fixed interval is okay for now)
+    // 0.4s between double beats, 0.8s between cycles
+    const nextBeatDelay = (Math.random() > 0.5) ? 0.3 : 0.6;
+    
+    this.heartbeatTimeout = setTimeout(() => {
+      if (this.ctx) this.playHeartbeat(this.ctx.currentTime);
+    }, nextBeatDelay * 1000);
+  }
+
+  stopOverloadAudio() {
+    this.isPlayingHeartbeat = false;
+    if (this.heartbeatTimeout) {
+      clearTimeout(this.heartbeatTimeout);
+      this.heartbeatTimeout = null;
+    }
+    if (this.tinnitusOsc) {
+      try {
+        this.tinnitusGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 1);
+        this.tinnitusOsc.stop(this.ctx.currentTime + 1);
+      } catch(e) {}
+      this.tinnitusOsc = null;
+    }
+  }
 }
 
 const audioSystem = new AudioSystem();

@@ -322,12 +322,44 @@ html, body, #root {
 
 /* Trạng thái Overload cực hạn */
 .overload-effect {
-  animation: glitch 0.1s linear infinite, overload-pulse 2s ease-in-out infinite;
+  animation: glitch-heavy 0.1s linear infinite, overload-pulse 2s ease-in-out infinite;
+  position: relative;
+}
+
+.overload-effect::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.85) 100%);
+  pointer-events: none;
+  z-index: 100;
+  animation: heartbeat-vignette 1s ease-in-out infinite;
+}
+
+.overload-effect * {
+  text-shadow: 
+    -2px 0 hsl(0 100% 50% / 0.6),
+    2px 0 hsl(200 100% 50% / 0.6) !important;
+}
+
+@keyframes glitch-heavy {
+  0% { transform: translate(0); filter: hue-rotate(0deg); }
+  20% { transform: translate(-3px, 2px); filter: hue-rotate(15deg); }
+  40% { transform: translate(2px, -2px); }
+  60% { transform: translate(-2px, 0); filter: hue-rotate(-15deg); }
+  80% { transform: translate(3px, 2px); }
+  100% { transform: translate(0); filter: hue-rotate(0deg); }
 }
 
 @keyframes overload-pulse {
-  0%, 100% { filter: grayscale(80%) contrast(1.5) blur(1px); }
-  50% { filter: grayscale(100%) contrast(2) blur(3px) brightness(0.6); }
+  0%, 100% { filter: grayscale(70%) contrast(1.5) blur(1px) brightness(0.7); }
+  50% { filter: grayscale(100%) contrast(2.5) blur(4px) brightness(0.4); }
+}
+
+@keyframes heartbeat-vignette {
+  0%, 100% { background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.85) 100%); }
+  15% { background: radial-gradient(circle at center, transparent 20%, rgba(50,0,0,0.9) 100%); }
+  30% { background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.85) 100%); }
 }
 
 /* Chromatic aberration - hiệu ứng lệch màu khi stress */
