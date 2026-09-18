@@ -433,6 +433,7 @@ export default function GameCanvas() {
   const canvasRef = useRef(null);
   const promptRef = useRef(null);
   const studyPromptRef = useRef(null);
+  const guideRef = useRef(null);
   const mapWrapperRef = useRef(null);
   const activeAnimRef = useRef(null);
 
@@ -2912,7 +2913,7 @@ export default function GameCanvas() {
          const t = performance.now() - anim.start;
          
          // Vẽ thêm nước bồn tắm che ngang người
-         ctx.fillStyle = 'rgba(56, 189, 248, 0.75)';
+         ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
          ctx.fillRect(25.5 * tileSize, 2.5 * tileSize, 5 * tileSize, 3 * tileSize); // Nước che ngập người
          
          // Draw water falling from top
@@ -3084,6 +3085,7 @@ export default function GameCanvas() {
           
           if (activeAnimRef.current) {
             promptRef.current.style.opacity = '0';
+            if (guideRef.current) guideRef.current.style.opacity = '0';
             if (activeAnimRef.current.type === 'study' && studyPromptRef.current) {
                studyPromptRef.current.style.opacity = '1';
             } else if (studyPromptRef.current) {
@@ -3091,6 +3093,7 @@ export default function GameCanvas() {
             }
           } else {
             promptRef.current.style.opacity = ''; // Trả lại quyền điều khiển cho React class
+            if (guideRef.current) guideRef.current.style.opacity = '1';
             if (studyPromptRef.current) studyPromptRef.current.style.opacity = '0';
           }
         }
@@ -3274,7 +3277,7 @@ export default function GameCanvas() {
         </div>
 
         {/* Controls hint */}
-        <div className="absolute top-16 right-4 z-40 p-3 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 text-white shadow-lg text-xs font-medium space-y-2 max-w-[200px]">
+        <div ref={guideRef} className="absolute top-16 right-4 z-40 p-3 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 text-white shadow-lg text-xs font-medium space-y-2 max-w-[200px] transition-opacity duration-200">
           <div className="text-yellow-400 font-bold border-b border-white/20 pb-1 mb-2">HƯỚNG DẪN</div>
           <div className="flex justify-between"><span>Di chuyển:</span> <span className="text-blue-300">W A S D</span></div>
           <div className="flex justify-between"><span>Tương tác:</span> <span className="text-green-300">E / SPACE</span></div>
