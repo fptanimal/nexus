@@ -537,10 +537,10 @@ export default function GameCanvas() {
       const oldPos = { x: posRef.current.x, y: posRef.current.y };
       activeAnimRef.current = { type, start: performance.now(), data, oldPos };
       
-      // Nếu là tắm, di chuyển nhân vật vào giữa bồn tắm
+      // Nếu là tắm, di chuyển nhân vật vào giữa bồn tắm để camera lấy nét đúng
       if (type === 'shower') {
-        posRef.current.x = 27.5 * 16 - 16; // 16 is tileSize, but tileSize variable might not be available here, assuming 16
-        posRef.current.y = 3 * 16 - 16;
+        posRef.current.x = 28 * 32 - 16;
+        posRef.current.y = 3.5 * 32 - 16;
       }
       
       keysRef.current = { w: false, a: false, s: false, d: false }; // Stop movement
