@@ -14,10 +14,10 @@ export default function HouseBuilding() {
     // Absolutely NO smoothing
     ctx.imageSmoothingEnabled = false;
 
-    // Helper for hard-edged outlines (2px thick for consistency with environment)
+    // Helper for hard-edged outlines (1px thick now to match 1x1 scale)
     const drawOutline = (x, y, w, h, outColor, inColor) => {
       ctx.fillStyle = outColor;
-      ctx.fillRect(x - 2, y - 2, w + 4, h + 4);
+      ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
       ctx.fillStyle = inColor;
       ctx.fillRect(x, y, w, h);
     };
@@ -25,13 +25,16 @@ export default function HouseBuilding() {
     // --- 1. Chimney ---
     // x=188, y=8, w=24, h=60
     drawOutline(188, 8, 24, 60, '#450a0a', '#ea580c');
-    // Chimney texture (flat pixels, 1x1 scale)
-    ctx.fillStyle = '#c2410c'; // darker flat orange
-    ctx.fillRect(192, 16, 8, 4);
-    ctx.fillRect(200, 24, 8, 4);
-    ctx.fillRect(190, 36, 12, 4);
-    ctx.fillRect(204, 44, 6, 4);
-    ctx.fillRect(192, 56, 10, 4);
+    // Chimney texture (flat 1x1 scale pixels)
+    ctx.fillStyle = '#c2410c';
+    for(let cy = 12; cy < 68; cy += 4) {
+       let offsetX = (cy % 8 === 0) ? 0 : 3;
+       for(let cx = 188 + offsetX; cx < 212; cx += 7) {
+          if (cx + 5 <= 212) {
+             ctx.fillRect(cx, cy, 5, 2);
+          }
+       }
+    }
 
     // --- 2. Walls ---
     // Wall box (centered, 216 wide, 192 high)
@@ -41,50 +44,58 @@ export default function HouseBuilding() {
     ctx.fillStyle = '#fde68a';
     ctx.fillRect(204, 64, 32, 192);
     
-    // Base stone texture (bottom 16px)
+    // Base stone texture (bottom 16px) with 1px cracks
     ctx.fillStyle = '#d6d3d1';
     ctx.fillRect(20, 240, 216, 16); 
-    ctx.fillStyle = '#a8a29e'; // Darker stone flat lines
-    for(let i = 20; i < 236; i+=16) {
-       ctx.fillRect(i, 240, 2, 16); // vertical cracks
-       ctx.fillRect(i+8, 248, 16, 2); // horizontal cracks
+    ctx.fillStyle = '#a8a29e'; // Darker stone flat lines (1px)
+    for(let y = 240; y < 256; y += 4) {
+       ctx.fillRect(20, y, 216, 1); // horizontal cracks
+       let offsetX = (y % 8 === 0) ? 0 : 4;
+       for(let x = 20 + offsetX; x < 236; x += 8) {
+          ctx.fillRect(x, y, 1, 4); // vertical cracks
+       }
     }
 
     // --- 3. Roof ---
     // Stair-stepped trapezoid, perfectly flat colors
     ctx.fillStyle = '#450a0a'; // Roof outline
     
-    // Draw stair-stepped outline
+    // Draw stair-stepped outline (1px steps)
     for (let i = 0; i < 52; i++) {
        // Left slope
-       ctx.fillRect(52 - i, 16 + i, 4, 2);
+       ctx.fillRect(52 - i, 16 + i, 2, 1);
        // Right slope
-       ctx.fillRect(200 + i, 16 + i, 4, 2);
+       ctx.fillRect(202 + i, 16 + i, 2, 1);
     }
     // Roof top edge
-    ctx.fillRect(52, 14, 152, 4);
+    ctx.fillRect(52, 15, 152, 1);
     // Roof bottom edge
-    ctx.fillRect(0, 66, 256, 4);
+    ctx.fillRect(0, 68, 256, 1);
     
     // Fill roof body
     ctx.fillStyle = '#991b1b'; // Base red roof
-    for (let i = 0; i < 50; i++) {
-       ctx.fillRect(52 - i, 16 + i, 152 + i*2, 2);
+    for (let i = 0; i < 52; i++) {
+       ctx.fillRect(52 - i + 1, 16 + i, 150 + i*2, 1); // Fill inside the outline
     }
     
     // Bottom flap of roof
     ctx.fillStyle = '#7f1d1d';
-    ctx.fillRect(2, 62, 252, 4);
+    ctx.fillRect(1, 65, 254, 3);
     
-    // Roof texture (vertical pixel lines, flat, no blend)
+    // Roof texture (1-unit wide stripes, perfectly matching grass pixel scale)
     ctx.fillStyle = '#7f1d1d';
-    for (let x = 32; x < 224; x+=16) {
-       for(let y = 20; y < 62; y++) {
+    for (let x = 4; x < 252; x += 4) {
+       for(let y = 17; y < 65; y++) {
           let leftBound = 52 - (y - 16);
           let rightBound = 204 + (y - 16);
           if (x >= leftBound && x <= rightBound) {
-             ctx.fillRect(x, y, 2, 2);
-             if (y % 8 === 0) ctx.fillRect(x+2, y, 4, 2); // Hard flat cross-hatch
+             ctx.fillRect(x, y, 1, 1); // 1px vertical line
+             // Horizontal tile separators every 6px, staggered
+             let isStaggered = (x % 8 === 0);
+             let yCheck = isStaggered ? (y % 6 === 0) : (y % 6 === 3);
+             if (yCheck && x + 3 <= rightBound) {
+                 ctx.fillRect(x, y, 4, 1); 
+             }
           }
        }
     }
@@ -95,21 +106,21 @@ export default function HouseBuilding() {
        
        // Inner glass (Flat base color, NO diagonal gloss/gradient)
        ctx.fillStyle = '#38bdf8';
-       ctx.fillRect(wx+4, wy+4, 40, 40);
+       ctx.fillRect(wx+2, wy+2, 44, 44);
        
-       // Frame cross
+       // Frame cross (2px thick)
        ctx.fillStyle = '#78350f';
-       ctx.fillRect(wx+22, wy, 4, 48);
-       ctx.fillRect(wx, wy+22, 48, 4);
+       ctx.fillRect(wx+23, wy, 2, 48);
+       ctx.fillRect(wx, wy+23, 48, 2);
        
-       // EXACTLY 2 small solid-color square highlight pixels (pixel-art style, no streak)
+       // EXACTLY 2 small solid-color square highlight pixels (1x1 pixel-art style, no streak)
        ctx.fillStyle = '#bae6fd'; // highlight flat color
        // Top-left pane highlight
-       ctx.fillRect(wx+6, wy+6, 4, 4);
-       ctx.fillRect(wx+12, wy+6, 2, 2);
+       ctx.fillRect(wx+4, wy+4, 1, 1);
+       ctx.fillRect(wx+6, wy+4, 1, 1);
        // Top-right pane highlight
-       ctx.fillRect(wx+28, wy+6, 4, 4);
-       ctx.fillRect(wx+34, wy+6, 2, 2);
+       ctx.fillRect(wx+26, wy+4, 1, 1);
+       ctx.fillRect(wx+28, wy+4, 1, 1);
     };
     drawWindow(40, 104); // Left window
     drawWindow(168, 104); // Right window
@@ -124,16 +135,23 @@ export default function HouseBuilding() {
     
     // Door panels
     ctx.fillStyle = '#451a03'; // Flat darker wood panels
-    ctx.fillRect(dx+8, dy+8, 20, 28);
-    ctx.fillRect(dx+36, dy+8, 20, 28);
-    ctx.fillRect(dx+8, dy+40, 20, 24);
-    ctx.fillRect(dx+36, dy+40, 20, 24);
+    // 1px borders for the panels to match the 1:1 scale
+    const drawPanel = (px, py, pw, ph) => {
+        ctx.fillRect(px, py, pw, 1);
+        ctx.fillRect(px, py+ph-1, pw, 1);
+        ctx.fillRect(px, py, 1, ph);
+        ctx.fillRect(px+pw-1, py, 1, ph);
+    };
+    drawPanel(dx+8, dy+8, 20, 28);
+    drawPanel(dx+36, dy+8, 20, 28);
+    drawPanel(dx+8, dy+40, 20, 24);
+    drawPanel(dx+36, dy+40, 20, 24);
     
-    // Doorknob (single flat pixel block)
+    // Doorknob (single 2x2 flat pixel block)
     ctx.fillStyle = '#fbbf24';
-    ctx.fillRect(dx+52, dy+36, 4, 8);
+    ctx.fillRect(dx+54, dy+38, 2, 2);
     ctx.fillStyle = '#d97706';
-    ctx.fillRect(dx+54, dy+40, 2, 4); // Doorknob shadow
+    ctx.fillRect(dx+55, dy+40, 1, 1); // Doorknob shadow
 
   }, []);
 
