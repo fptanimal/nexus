@@ -159,14 +159,14 @@ export default function App() {
         {/* Stats */}
         <div className="sidebar-section">
           <p className="sidebar-label">Chỉ số</p>
-          <div className="flex flex-col gap-2.5">
-            <StatBar icon={<Activity size={13} />} label="Năng lượng" value={energy} type="energy" isWarning={isLowEnergy} />
-            <StatBar icon={<Brain size={13} />} label="Stress" value={stress} type="stress" isWarning={isHighlyStressed} />
-            <StatBar icon={<Users size={13} />} label="Kết nối" value={connection} type="connection" />
-            <StatBar icon={<BookOpen size={13} />} label="Học lực" value={academics} type="academics" />
+          <div className="flex flex-col gap-4">
+            <StatBar icon={<Activity size={16} />} label="Năng lượng" value={energy} type="energy" isWarning={isLowEnergy} />
+            <StatBar icon={<Brain size={16} />} label="Stress" value={stress} type="stress" isWarning={isHighlyStressed} />
+            <StatBar icon={<Users size={16} />} label="Kết nối" value={connection} type="connection" />
+            <StatBar icon={<BookOpen size={16} />} label="Học lực" value={academics} type="academics" />
             {/* Chân Thật — chỉ hiện khi > 0 */}
             {authenticity > 0 && (
-              <StatBar icon={<Heart size={13} />} label="Chân thật" value={authenticity} type="authenticity" />
+              <StatBar icon={<Heart size={16} />} label="Chân thật" value={authenticity} type="authenticity" />
             )}
           </div>
         </div>
@@ -177,22 +177,22 @@ export default function App() {
         {/* Toolkit */}
         <div className="sidebar-section">
           <p className="sidebar-label">Hộp công cụ</p>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-3">
             <button className="rpg-btn highlight" onClick={() => { audioSystem.playClick(); setShowBreathing(true); }}>
-              <Wind size={13} className="shrink-0 mt-0.5" />
+              <Wind size={18} className="shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium" style={{ fontSize: '11px' }}>Thở 4-7-8</p>
-                <p style={{ color: 'var(--color-text-muted)', fontSize: '9px' }}>
+                <p className="font-bold" style={{ fontSize: '13px' }}>Thở 4-7-8</p>
+                <p style={{ color: 'var(--color-text-muted)', fontSize: '10px' }}>
                   Giảm stress · Hồi NL
                 </p>
               </div>
             </button>
 
             <button className="rpg-btn highlight" onClick={() => { audioSystem.playClick(); setShowGrounding(true); }}>
-              <Flower2 size={13} className="shrink-0 mt-0.5" />
+              <Flower2 size={18} className="shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium" style={{ fontSize: '11px' }}>Grounding 5-4-3-2-1</p>
-                <p style={{ color: 'var(--color-text-muted)', fontSize: '9px' }}>
+                <p className="font-bold" style={{ fontSize: '13px' }}>Grounding 5-4-3-2-1</p>
+                <p style={{ color: 'var(--color-text-muted)', fontSize: '10px' }}>
                   Neo hiện tại · Giảm lo âu
                 </p>
               </div>
@@ -201,19 +201,31 @@ export default function App() {
         </div>
 
         {/* Footer */}
-        <div className="mt-auto sidebar-section text-center flex flex-col gap-2" style={{ borderBottom: 'none' }}>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '9px' }}>
+        <div className="mt-auto sidebar-section text-center flex flex-col gap-3" style={{ borderBottom: 'none' }}>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '11px' }}>
             ⏱ {timeLimit} phút
           </p>
           <button 
             onClick={endGame}
-            className="w-full py-1.5 rounded transition-all"
+            className="w-full py-2.5 font-bold rounded-lg transition-all"
             style={{ 
-              background: 'var(--color-bg-surface)', 
+              background: 'hsl(0 60% 15%)', 
               color: 'var(--color-stress)',
               border: '1px solid var(--color-stress)',
-              fontSize: '10px'
-            }}>
+              boxShadow: '0 0 10px rgba(220, 53, 69, 0.1)',
+              fontSize: '11px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'hsl(0 60% 20%)';
+              e.currentTarget.style.boxShadow = '0 0 15px var(--color-stress-glow)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'hsl(0 60% 15%)';
+              e.currentTarget.style.boxShadow = '0 0 10px rgba(220, 53, 69, 0.1)';
+            }}
+            >
             Về màn hình chính
           </button>
         </div>
@@ -248,13 +260,13 @@ export default function App() {
 function StatBar({ icon, label, value, type, isWarning }) {
   return (
     <div>
-      <div className={`flex justify-between items-center mb-1 ${isWarning ? 'stat-warning' : ''}`}>
-        <div className="flex items-center gap-1.5" 
-          style={{ color: isWarning ? 'var(--color-stress)' : 'var(--color-text-secondary)', fontSize: '10px' }}>
+      <div className={`flex justify-between items-center mb-1.5 ${isWarning ? 'stat-warning' : ''}`}>
+        <div className="flex items-center gap-2" 
+          style={{ color: isWarning ? 'var(--color-stress)' : 'var(--color-text-secondary)', fontSize: '11px', fontWeight: 'bold' }}>
           {icon}
-          <span style={{ letterSpacing: '0.03em' }}>{label}</span>
+          <span style={{ letterSpacing: '0.05em' }}>{label}</span>
         </div>
-        <span className="font-mono" style={{ fontSize: '10px', color: 'var(--color-text-primary)' }}>
+        <span className="font-mono font-bold" style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}>
           {Math.round(value)}
         </span>
       </div>
@@ -289,11 +301,12 @@ function SidebarTimeAndSchedule() {
         <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
           Chương {currentChapter} · Ngày {currentDay}
         </p>
-        <div className="mt-2 font-mono text-lg py-1 rounded text-glow-energy"
+        <div className="mt-4 font-mono text-3xl font-bold py-3 rounded-lg text-glow-energy"
              style={{ 
                color: 'var(--color-energy)', 
-               background: 'var(--color-bg-deep)', 
-               border: '1px solid var(--color-border)' 
+               background: 'hsl(125 15% 10%)', 
+               border: '2px solid hsl(152 70% 50% / 0.2)',
+               boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.6)'
              }}>
           {formatTime(inGameTime)}
         </div>
@@ -302,12 +315,13 @@ function SidebarTimeAndSchedule() {
       {/* Schedule Bar */}
       <div className="sidebar-section">
         <p className="sidebar-label">Lịch trình</p>
-        <div className="flex items-center gap-2 px-1 py-1.5 rounded"
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
           style={{ 
-            background: 'var(--color-bg-deep)', 
+            background: 'hsl(125 15% 14%)', 
             border: '1px solid var(--color-border)',
-            fontSize: '11px',
-            color: 'var(--color-text-secondary)'
+            fontSize: '12px',
+            color: 'var(--color-text-primary)',
+            fontWeight: '600'
           }}>
           <span>{schedule.label}</span>
         </div>

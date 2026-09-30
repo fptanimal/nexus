@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import audioSystem from '../utils/audioSystem';
 import eventBus from '../engine/EventBus';
+import * as RoomConfig from '../config/RoomConfig';
 
 // ── SCHEDULE SYSTEM ──────────────────────────────────────
 const SCHEDULE = [
@@ -156,35 +157,37 @@ const MAPS = {
     return m;
   })(),
   home: (() => {
-    const rows = 24;
-    const cols = 32;
+    const { ROOM_ROWS, ROOM_COLS, SOFA_X, SOFA_Y, SOFA_W, SOFA_H, TV_X, TV_Y, TV_W, TV_H, PANEL_X, PANEL_Y, PANEL_W, PANEL_H, PLANT_X, PLANT_Y, PLANT_W, PLANT_H } = RoomConfig;
+    const rows = ROOM_ROWS;
+    const cols = ROOM_COLS;
     const m = Array(rows).fill(null).map(() => Array(cols).fill(0));
-    // Tường bao quanh ngoài cùng
+    
+    // Tường bao quanh ngoài cùng (1 là tường/khối va chạm)
     for (let c = 0; c < cols; c++) { m[0][c] = 1; m[rows-1][c] = 1; }
     for (let r = 0; r < rows; r++) { m[r][0] = 1; m[r][cols-1] = 1; }
-    // Vách ngăn ngang (tách trên dưới) tại hàng 12
-    for (let c = 1; c < cols-1; c++) { if (c !== 8 && c !== 9 && c !== 22 && c !== 23) m[12][c] = 1; }
-    // Vách ngăn dọc 1 (tách Ngủ và Tắm ở trên) tại cột 16
-    for (let r = 1; r < 12; r++) { if (r !== 6 && r !== 7) m[r][16] = 1; }
-    // Vách ngăn dọc 2 (tách Bếp và Khách ở dưới) tại cột 14
-    for (let r = 13; r < rows-1; r++) { if (r !== 18 && r !== 19) m[r][14] = 1; }
-    // Cửa ra ngoài (ở phòng khách, cạnh dưới)
-    m[23][22] = 0; m[23][23] = 0; m[23][24] = 0;
-    // Bố trí nội thất (chặn di chuyển):
-    // Ngủ (Bedroom) dựa theo SVG gốc:
-    for (let r=6; r<=9; r++) for (let c=4; c<=7; c++) m[r][c] = 2; // Giường (x=4, y=6, w=4, h=4)
-    for (let r=1; r<=3; r++) for (let c=3; c<=8; c++) m[r][c] = 2; // Bàn PC (x=3, y=0 -> hitbox bắt đầu từ r=1, dài c=3..8)
-    for (let r=1; r<=2; r++) for (let c=1; c<=2; c++) m[r][c] = 2; // Chậu cây (x=1, y=1, w=2, h=2)
-    // Tắm:
-    for (let r=2; r<=5; r++) for (let c=25; c<=30; c++) m[r][c] = 2; // Bồn tắm
-    // Bếp:
-    for (let r=14; r<=18; r++) for (let c=1; c<=3; c++) m[r][c] = 2; // Tủ lạnh
-    for (let r=17; r<=19; r++) for (let c=6; c<=9; c++) m[r][c] = 2; // Bàn ăn
-    // Khách:
-    for (let r=18; r<=20; r++) for (let c=17; c<=20; c++) m[r][c] = 2; // Sofa
-    for (let r=15; r<=16; r++) for (let c=23; c<=25; c++) m[r][c] = 2; // Kệ TV
-    for (let r=13; r<=13; r++) for (let c=20; c<=21; c++) m[r][c] = 2; // Kệ sách
-    for (let r=14; r<=15; r++) for (let c=27; c<=28; c++) m[r][c] = 2; // Cây cảnh lớn
+
+    // Hitboxes từ config
+    for (let r = SOFA_Y; r < SOFA_Y + SOFA_H; r++) {
+      for (let c = SOFA_X; c < SOFA_X + SOFA_W; c++) {
+        m[r][c] = 2; // sofa
+      }
+    }
+    for (let r = TV_Y; r < TV_Y + TV_H; r++) {
+      for (let c = TV_X; c < TV_X + TV_W; c++) {
+        m[r][c] = 2; // tv
+      }
+    }
+    for (let r = PANEL_Y; r < PANEL_Y + PANEL_H; r++) {
+      for (let c = PANEL_X; c < PANEL_X + PANEL_W; c++) {
+        m[r][c] = 2; // panel
+      }
+    }
+    for (let r = PLANT_Y; r < PLANT_Y + PLANT_H; r++) {
+      for (let c = PLANT_X; c < PLANT_X + PLANT_W; c++) {
+        m[r][c] = 2; // plant
+      }
+    }
+
     return m;
   })(),
   classroom: (() => {
@@ -369,7 +372,7 @@ const useGameStore = create((set, get) => ({
   currentLocation: 'home',
   
   // ── Player Position ──
-  playerPos: { x: 23, y: 20 },
+  playerPos: { x: 12, y: 10 },
 
   // ── NPC System ──
   npcs: [
@@ -505,7 +508,7 @@ const useGameStore = create((set, get) => ({
       inGameTime: 7 * 60,
       currentDay: 1,
       currentLocation: 'home',
-      playerPos: { x: 23, y: 20, facing: 'up' },
+      playerPos: { x: 12, y: 10, facing: 'up' },
       
       // Trạng thái trị liệu
       intrusiveThought: null,

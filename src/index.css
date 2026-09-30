@@ -142,16 +142,18 @@ html, body, #root {
    STAT BARS — RPG-style
    ══════════════════════════════════════════════════════════ */
 .stat-bar-track {
-  height: 8px;
+  height: 10px;
   background: var(--color-bg-deep);
   border: 1px solid var(--color-border);
-  border-radius: 1px;
+  border-radius: 6px;
   overflow: hidden;
   position: relative;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
 }
 
 .stat-bar-fill {
   height: 100%;
+  border-radius: 4px;
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
 }
@@ -169,25 +171,26 @@ html, body, #root {
 }
 
 /* Pixel-stepped animation cho stat bars khi thay đổi */
-.stat-bar-fill.energy { background: var(--color-energy); box-shadow: 0 0 8px var(--color-energy-glow); }
-.stat-bar-fill.stress { background: var(--color-stress); box-shadow: 0 0 8px var(--color-stress-glow); }
-.stat-bar-fill.connection { background: var(--color-connection); box-shadow: 0 0 8px var(--color-connection-glow); }
-.stat-bar-fill.academics { background: var(--color-academics); box-shadow: 0 0 8px var(--color-academics-glow); }
-.stat-bar-fill.authenticity { background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent-glow); }
+.stat-bar-fill.energy { background: var(--color-energy); box-shadow: inset 0 0 4px rgba(255,255,255,0.4), 0 0 8px var(--color-energy-glow); }
+.stat-bar-fill.stress { background: var(--color-stress); box-shadow: inset 0 0 4px rgba(255,255,255,0.4), 0 0 8px var(--color-stress-glow); }
+.stat-bar-fill.connection { background: var(--color-connection); box-shadow: inset 0 0 4px rgba(255,255,255,0.4), 0 0 8px var(--color-connection-glow); }
+.stat-bar-fill.academics { background: var(--color-academics); box-shadow: inset 0 0 4px rgba(255,255,255,0.4), 0 0 8px var(--color-academics-glow); }
+.stat-bar-fill.authenticity { background: var(--color-accent); box-shadow: inset 0 0 4px rgba(255,255,255,0.4), 0 0 8px var(--color-accent-glow); }
 
 /* ══════════════════════════════════════════════════════════
    RPG ACTION BUTTONS
    ══════════════════════════════════════════════════════════ */
 .rpg-btn {
   position: relative;
-  padding: 10px 14px;
+  padding: 12px 14px;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
+  border-radius: 6px;
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   text-align: left;
   display: flex;
   align-items: flex-start;
@@ -197,12 +200,12 @@ html, body, #root {
 .rpg-btn:hover:not(:disabled) {
   background: var(--color-bg-elevated);
   border-color: var(--color-border-light);
-  transform: translateX(3px);
-  box-shadow: -3px 0 0 0 var(--color-accent);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
 .rpg-btn:active:not(:disabled) {
-  transform: translateX(3px) scale(0.98);
+  transform: translateY(1px) scale(0.98);
 }
 
 .rpg-btn:disabled {
@@ -212,19 +215,20 @@ html, body, #root {
 
 .rpg-btn.highlight {
   border-color: var(--color-cyan);
-  background: hsl(185 75% 55% / 0.08);
+  background: hsl(185 75% 55% / 0.05);
+  border-left: 3px solid var(--color-cyan);
 }
 
 .rpg-btn.highlight:hover:not(:disabled) {
-  background: hsl(185 75% 55% / 0.15);
-  box-shadow: -3px 0 0 0 var(--color-cyan);
+  background: hsl(185 75% 55% / 0.12);
+  box-shadow: 0 4px 12px var(--color-cyan-glow);
 }
 
 /* Selector arrow (▸) cho nút đang hover */
 .rpg-btn:hover:not(:disabled)::before {
   content: "▸";
   position: absolute;
-  left: 4px;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--color-accent);
@@ -480,9 +484,13 @@ html, body, #root {
 .title-glow {
   text-shadow:
     0 0 10px var(--color-accent-glow),
-    0 0 30px hsl(265 70% 65% / 0.2),
-    0 0 60px hsl(265 70% 65% / 0.1);
-  letter-spacing: 0.15em;
+    0 0 20px hsl(265 70% 65% / 0.4),
+    0 0 40px hsl(265 70% 65% / 0.2);
+  letter-spacing: 0.25em;
+  background: linear-gradient(to right, #e0c3fc, #8ec5fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
 .time-select-btn {
@@ -516,22 +524,33 @@ html, body, #root {
    ══════════════════════════════════════════════════════════ */
 .sidebar {
   background: var(--color-bg-base);
-  border-right: 2px solid var(--color-border);
+  border-right: 1px solid hsl(125 15% 15%);
+  box-shadow: 4px 0 15px rgba(0,0,0,0.3);
 }
 
 .sidebar-section {
-  padding: 12px;
-  border-bottom: 1px solid var(--color-border);
+  padding: 16px;
+  border-bottom: 1px solid hsl(125 15% 18%);
 }
 
 .sidebar-label {
   font-family: var(--font-sans);
-  font-weight: 800;
+  font-weight: 700;
   font-size: 10px;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--color-text-muted);
-  margin-bottom: 8px;
+  color: hsl(215 10% 50%);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, hsl(125 20% 30%), transparent);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -582,6 +601,35 @@ html, body, #root {
     inset -4px -4px 0px 0px #c8e6c9,
     8px 8px 0px 0px rgba(0,0,0,0.15);
   border-radius: 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CUSTOM SLIDERS
+   ══════════════════════════════════════════════════════════ */
+input[type="range"].custom-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+}
+
+input[type="range"].custom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background: currentColor;
+  cursor: pointer;
+  box-shadow: 0 0 6px currentColor;
+  margin-top: -3px; /* Căn giữa thumb theo track */
+}
+
+input[type="range"].custom-slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  background: var(--color-bg-deep);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
 }
 
 /* ══════════════════════════════════════════════════════════

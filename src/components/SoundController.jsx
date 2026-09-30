@@ -39,26 +39,26 @@ export default function SoundController() {
       </div>
 
       {soundEnabled && (
-        <div className="flex flex-col gap-2 mt-2 px-1 py-1.5 rounded"
-             style={{ background: 'var(--color-bg-deep)', border: '1px solid var(--color-border)' }}>
+        <div className="flex flex-col gap-3 mt-3 px-3 py-3 rounded-lg"
+             style={{ background: 'hsl(125 15% 14%)', border: '1px solid var(--color-border)', boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.2)' }}>
           
           {/* BGM Controls */}
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--color-text-secondary)', fontSize: '10px' }}>
-              <Music size={11} />
+            <div className="flex items-center gap-1.5 font-bold" style={{ color: 'var(--color-text-secondary)', fontSize: '11px' }}>
+              <Music size={14} />
               <span>Nhạc</span>
             </div>
             <div className="flex items-center gap-1">
               <button 
                 onClick={prevTrack} 
-                className="px-1 text-[10px] bg-[var(--color-bg-dark)] rounded hover:bg-[var(--color-border)]"
+                className="px-1.5 py-0.5 text-[10px] bg-[var(--color-bg-dark)] rounded hover:bg-[var(--color-border)] transition-colors"
                 title="Bài trước"
               >
                 ◀
               </button>
               <button 
                 onClick={nextTrack} 
-                className="px-1 text-[10px] bg-[var(--color-bg-dark)] rounded hover:bg-[var(--color-border)]"
+                className="px-1.5 py-0.5 text-[10px] bg-[var(--color-bg-dark)] rounded hover:bg-[var(--color-border)] transition-colors"
                 title="Bài tiếp"
               >
                 ▶
@@ -71,14 +71,15 @@ export default function SoundController() {
               step="0.05"
               value={bgmVolume}
               onChange={(e) => setBgmVolume(parseFloat(e.target.value))}
-              className="w-12 accent-[var(--color-accent)] h-1.5 rounded cursor-pointer"
+              className="w-16 accent-[var(--color-accent)] custom-slider"
+              style={{ color: 'var(--color-accent)' }}
             />
           </div>
 
           {/* SFX Slider */}
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--color-text-secondary)', fontSize: '10px' }}>
-              <Speaker size={11} />
+            <div className="flex items-center gap-1.5 font-bold" style={{ color: 'var(--color-text-secondary)', fontSize: '11px' }}>
+              <Speaker size={14} />
               <span>Hiệu ứng</span>
             </div>
             <input 
@@ -92,7 +93,8 @@ export default function SoundController() {
                 setSfxVolume(val);
                 audioSystem.playClick();
               }}
-              className="w-16 accent-[var(--color-energy)] h-1.5 rounded cursor-pointer"
+              className="w-20 accent-[var(--color-energy)] custom-slider"
+              style={{ color: 'var(--color-energy)' }}
             />
           </div>
         </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useGameStore, { MAPS } from '../store/useGameStore';
 import audioSystem from '../utils/audioSystem';
+import * as RoomConfig from '../config/RoomConfig.js';
 import roomLayout from '../config/RoomLayout.js';
 import SchoolOverlay from './SchoolOverlay';
 import LibraryBuilding from './LibraryBuilding';
@@ -1078,65 +1079,61 @@ export default function GameCanvas() {
 
       // 0.5 Fill map background and custom floors BEFORE tileset rendering to prevent gaps at doorways
       if (currentLocation === 'home') {
-        ctx.fillStyle = '#111';
-        ctx.fillRect(0, 0, 32 * tileSize, 24 * tileSize);
-
-        // 1. Sàn phòng ngủ (Gỗ - Wood floor) - phủ tràn qua c=16
-        ctx.fillStyle = '#d4a373'; ctx.fillRect(0, 0, 17 * tileSize, 13 * tileSize);
-        ctx.fillStyle = '#c08a55';
-        for (let r = 0; r < 13; r++) {
-          ctx.fillRect(0, r * tileSize + tileSize - 2, 17 * tileSize, 2);
-          for (let c = 0; c < 17; c++) {
-            if ((r + c) % 3 === 0) ctx.fillRect(c * tileSize + 10, r * tileSize, 2, tileSize);
-            ctx.fillStyle = (c + r) % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-            ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
-            ctx.fillStyle = '#c08a55';
-          }
-        }
-        // Lớp phủ bóng loáng (Glossy finish) cho sàn gỗ
-        const gradWood = ctx.createLinearGradient(0, 0, 17 * tileSize, 13 * tileSize);
-        gradWood.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
-        gradWood.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
-        gradWood.addColorStop(1, 'rgba(0, 0, 0, 0.15)');
-        ctx.fillStyle = gradWood; ctx.fillRect(0, 0, 17 * tileSize, 13 * tileSize);
-
-        // 2. Sàn phòng tắm (Caro + Highlight)
-        for (let r = 0; r < 13; r++) {
-          for (let c = 17; c < 32; c++) {
-            ctx.fillStyle = (r + c) % 2 === 0 ? '#ffffff' : '#bae6fd';
-            ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.beginPath(); ctx.arc(c * tileSize + 6, r * tileSize + 6, 2, 0, Math.PI * 2); ctx.fill();
-          }
-        }
-
-        // 3. Sàn phòng bếp
-        ctx.fillStyle = '#fef3c7'; ctx.fillRect(0, 13 * tileSize, 14 * tileSize, 11 * tileSize);
-        ctx.fillStyle = '#fde68a';
-        for (let r = 13; r < 24; r++) { ctx.fillRect(0, r * tileSize, 14 * tileSize, 2); }
-        for (let c = 0; c < 14; c++) { ctx.fillRect(c * tileSize, 13 * tileSize, 2, 11 * tileSize); }
-
-        // 4. Sàn phòng khách & Thảm
-        // Khách tràn luôn sang bếp ở lối đi (c=14) để che gap
-        ctx.fillStyle = '#fed7aa'; ctx.fillRect(14 * tileSize, 13 * tileSize, 18 * tileSize, 11 * tileSize);
+        const { ROOM_ROWS, ROOM_COLS, CARPET_X, CARPET_Y, CARPET_W, CARPET_H } = RoomConfig;
         
-        // Thảm lót sàn Boho (Rug) khu vực phòng khách
-        ctx.fillStyle = '#ecfdf5'; // Nền thảm Off-white
-        ctx.fillRect(15 * tileSize, 15 * tileSize, 11 * tileSize, 7 * tileSize);
-        ctx.fillStyle = '#10b981'; // Họa tiết xanh lá (Green Boho)
-        for (let rr = 15; rr < 22; rr++) {
-           for (let cc = 15; cc < 26; cc++) {
-              if ((rr+cc)%2===0) {
-                  ctx.beginPath(); ctx.arc(cc * tileSize + 8, rr * tileSize + 8, 4, 0, Math.PI*2); ctx.fill();
-              }
-           }
+        // 1. Nền đá xám (Grey stone floor)
+        ctx.fillStyle = '#9ca3af'; 
+        ctx.fillRect(0, 0, ROOM_COLS * tileSize, ROOM_ROWS * tileSize);
+        // Vân đá
+        ctx.fillStyle = '#6b7280';
+        for (let r = 0; r < ROOM_ROWS; r++) {
+          for (let c = 0; c < ROOM_COLS; c++) {
+            ctx.fillRect(c * tileSize, r * tileSize, tileSize, 2);
+            ctx.fillRect(c * tileSize, r * tileSize, 2, tileSize);
+          }
         }
-        // Tua rua quanh mép thảm
-        ctx.fillStyle = '#d1fae5';
-        for (let cc = 15 * tileSize; cc < 26 * tileSize; cc += 4) {
-           ctx.fillRect(cc, 15 * tileSize - 4, 2, 4); // Mép trên
-           ctx.fillRect(cc, 22 * tileSize, 2, 4);     // Mép dưới
+        
+        // 2. Sàn gỗ bên phải (Wood plank flooring)
+        const woodStartX = 14; // Gỗ bắt đầu từ cột 14
+        if (ROOM_COLS > woodStartX) {
+          ctx.fillStyle = '#d4a373';
+          ctx.fillRect(woodStartX * tileSize, 0, (ROOM_COLS - woodStartX) * tileSize, ROOM_ROWS * tileSize);
+          ctx.fillStyle = '#c08a55';
+          for (let r = 0; r < ROOM_ROWS; r++) {
+            ctx.fillRect(woodStartX * tileSize, r * tileSize + tileSize - 2, (ROOM_COLS - woodStartX) * tileSize, 2);
+            for (let c = woodStartX; c < ROOM_COLS; c++) {
+              if ((r + c) % 3 === 0) ctx.fillRect(c * tileSize + 10, r * tileSize, 2, tileSize);
+              ctx.fillStyle = (c + r) % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+              ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
+              ctx.fillStyle = '#c08a55';
+            }
+          }
         }
+
+        // 3. Thảm Mint/Teal
+        ctx.fillStyle = '#5eead4'; // Mint
+        ctx.fillRect(CARPET_X * tileSize, CARPET_Y * tileSize, CARPET_W * tileSize, CARPET_H * tileSize);
+        ctx.fillStyle = '#14b8a6'; // Teal pattern
+        for (let r = 0; r < CARPET_H; r++) {
+          for (let c = 0; c < CARPET_W; c++) {
+            if ((r + c) % 2 === 0) {
+              ctx.beginPath();
+              ctx.arc((CARPET_X + c) * tileSize + tileSize/2, (CARPET_Y + r) * tileSize + tileSize/2, 4, 0, Math.PI*2);
+              ctx.fill();
+            }
+          }
+        }
+        // Mint/Teal diagonal lines
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo((CARPET_X + 2) * tileSize, (CARPET_Y + 2) * tileSize);
+        ctx.lineTo((CARPET_X + CARPET_W - 2) * tileSize, (CARPET_Y + CARPET_H - 2) * tileSize);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo((CARPET_X + CARPET_W - 2) * tileSize, (CARPET_Y + 2) * tileSize);
+        ctx.lineTo((CARPET_X + 2) * tileSize, (CARPET_Y + CARPET_H - 2) * tileSize);
+        ctx.stroke();
       }
 
       // 1. Draw Map (Floor & Wall) - from ASCII
@@ -1199,330 +1196,105 @@ export default function GameCanvas() {
 
       // 2.1 Draw Tileset Props (luôn vẽ vì phòng ngủ đã nằm trong map main)
       if (currentLocation === 'home') {
-        // Hoạ tiết ziczac giữa thảm
-        ctx.beginPath();
-        for (let i = 0; i < 8; i++) {
-          ctx.moveTo(16 * tileSize + 10 + i * 32, 15 * tileSize + 10);
-          ctx.lineTo(16 * tileSize + 26 + i * 32, 15 * tileSize + 3.5 * tileSize);
-          ctx.lineTo(16 * tileSize + 10 + i * 32, 15 * tileSize + 7 * tileSize - 10);
-        }
-        ctx.strokeStyle = 'rgba(251, 146, 60, 0.3)'; ctx.lineWidth = 4; ctx.stroke();
-
-        // --- ĐỒ NỘI THẤT MICRO-DETAILS ---
+        const { SOFA_X, SOFA_Y, SOFA_W, SOFA_H, TV_X, TV_Y, TV_W, TV_H, PANEL_X, PANEL_Y, PANEL_W, PANEL_H, PLANT_X, PLANT_Y, PLANT_W, PLANT_H } = RoomConfig;
 
         ctx.save();
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-        ctx.shadowBlur = 8;
-        ctx.shadowOffsetY = 4;
-
         const fillRoundRect = (x, y, w, h, r) => {
           ctx.beginPath();
           if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
           ctx.fill();
         };
 
-        // ================= BỒN TẮM =================
-        let tx = 25 * tileSize, ty = 2 * tileSize, tw = 6 * tileSize, th = 4 * tileSize;
-        // Thảm chùi chân
-        ctx.fillStyle = '#e2e8f0';
-        fillRoundRect(tx - 20, ty + 16, 16, th - 32, 4);
+        // ================= RED SOFA & PINK PILLOWS =================
+        let sx = SOFA_X * tileSize, sy = SOFA_Y * tileSize, sw = SOFA_W * tileSize, sh = SOFA_H * tileSize;
         ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-
-        ctx.fillStyle = '#f8fafc'; // Vỏ bồn
-        fillRoundRect(tx, ty, tw, th, 12);
-
-        ctx.shadowColor = 'transparent';
-        let bx = tx + 8, by = ty + 8, bw = tw - 16, bh = th - 16;
-        let gradTub = ctx.createLinearGradient(bx, by, bx, by + bh);
-        gradTub.addColorStop(0, '#e2e8f0'); gradTub.addColorStop(1, '#ffffff');
-        ctx.fillStyle = gradTub;
-        fillRoundRect(bx, by, bw, bh, 8);
-
-        // Nước bồn tắm & Gợn sóng (Ripples)
-        let wx = bx + 4, wy = by + 4, ww = bw - 8, wh = bh - 8;
-        let gradWater = ctx.createRadialGradient(wx + ww / 2, wy + wh / 2, 5, wx + ww / 2, wy + wh / 2, ww / 1.5);
-        gradWater.addColorStop(0, '#38bdf8'); gradWater.addColorStop(1, '#0284c7');
-        ctx.fillStyle = gradWater;
-        fillRoundRect(wx, wy, ww, wh, 6);
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetY = 4;
         
-        // Hoạt ảnh gợn sóng (Sine wave ripples)
-        const t = performance.now() / 500;
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        for(let x = wx + 5; x < wx + ww - 5; x += 2) {
-           ctx.lineTo(x, wy + wh/2 + Math.sin(x/5 + t) * 4);
-        }
-        ctx.stroke();
-        ctx.beginPath();
-        for(let x = wx + 5; x < wx + ww - 5; x += 2) {
-           ctx.lineTo(x, wy + wh/2 + 10 + Math.sin(x/6 - t) * 3);
-        }
-        ctx.stroke();
-
-        // Bọt xà phòng (Bubbles)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        for (let i = 0; i < 15; i++) {
-          ctx.beginPath();
-          ctx.arc(wx + 10 + (i * 10) % ww, wy + 10 + (i * 7) % wh, 3 + (i % 3) * 2, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // Chai sữa tắm hồng
-        ctx.fillStyle = '#f472b6';
-        fillRoundRect(tx + tw - 16, ty + 12, 10, 14, 3);
-        ctx.fillStyle = '#fbcfe8'; fillRoundRect(tx + tw - 12, ty + 8, 4, 4, 1);
-
-        // Vòi sen
-        ctx.fillStyle = '#94a3b8'; fillRoundRect(tx - 4, ty + th / 2 - 8, 12, 16, 4);
-        ctx.fillStyle = '#cbd5e1'; ctx.beginPath(); ctx.arc(tx + 12, ty + th / 2, 8, 0, Math.PI * 2); ctx.fill();
-
-        // ================= TỦ LẠNH =================
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-        let fx = 2 * tileSize, fy = 14 * tileSize, fw = 2 * tileSize, fh = 3 * tileSize;
-        let gradFridge = ctx.createLinearGradient(fx, fy, fx + fw, fy);
-        gradFridge.addColorStop(0, '#94a3b8'); gradFridge.addColorStop(0.2, '#f1f5f9'); gradFridge.addColorStop(0.8, '#cbd5e1'); gradFridge.addColorStop(1, '#64748b'); // Hiệu ứng Inox bóng
-        ctx.fillStyle = gradFridge;
-        fillRoundRect(fx, fy, fw, fh, 6);
-
-        ctx.shadowColor = 'transparent';
-        ctx.fillStyle = '#475569'; ctx.fillRect(fx, fy + fh * 0.4, fw, 2); // Ngăn
-        ctx.fillStyle = '#0f172a';
-        fillRoundRect(fx + fw - 10, fy + 8, 4, fh * 0.25, 2); // Tay trên
-        fillRoundRect(fx + fw - 10, fy + fh * 0.4 + 8, 4, fh * 0.35, 2); // Tay dưới
-
-        // Màn hình LED & Khe lấy đá
-        ctx.fillStyle = '#1e293b'; fillRoundRect(fx + 8, fy + 12, 16, 24, 2);
-        ctx.fillStyle = '#0ea5e9'; ctx.fillRect(fx + 10, fy + 16, 12, 6); // Nhiệt độ sáng
-        ctx.fillStyle = '#38bdf8'; ctx.font = '5px Arial'; ctx.fillText('2°C', fx + 11, fy + 21);
-        ctx.fillStyle = '#0f172a'; fillRoundRect(fx + 8, fy + fh * 0.5, 16, 20, 2); // Dispenser
-        ctx.fillStyle = '#cbd5e1'; ctx.fillRect(fx + 12, fy + fh * 0.5 + 4, 8, 4); // Nút bấm
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; ctx.fillRect(fx + 14, fy + fh * 0.5 + 10, 4, 6); // Cốc thuỷ tinh
-
-        // Sticky Notes
-        ctx.fillStyle = '#fef08a'; ctx.fillRect(fx + 30, fy + 20, 10, 10);
-        ctx.fillStyle = '#000000'; ctx.fillRect(fx + 32, fy + 22, 6, 1); ctx.fillRect(fx + 32, fy + 24, 4, 1); // Chữ trên note
-        ctx.fillStyle = '#fca5a5'; ctx.fillRect(fx + 34, fy + 34, 10, 12);
-
-        // ================= BÀN ĂN =================
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        let dx = 6 * tileSize, dy = 17 * tileSize, dw = 4 * tileSize, dh = 3 * tileSize;
-        ctx.fillStyle = '#78350f'; fillRoundRect(dx, dy, dw, dh, 8); // Bàn
-        
-        ctx.shadowColor = 'transparent';
-        // Vân gỗ bàn ăn
-        ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.lineWidth = 1;
-        for(let i=1; i<dw/10; i++) {
-           ctx.beginPath(); ctx.moveTo(dx + i*10, dy+4); ctx.quadraticCurveTo(dx + i*10 + 5, dy+dh/2, dx + i*10, dy+dh-4); ctx.stroke();
-        }
-
-        ctx.fillStyle = '#f87171'; fillRoundRect(dx + 12, dy + 8, dw - 24, dh - 16, 4); // Khăn
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(dx + 24, dy + 8, dw - 48, dh - 16); // Sọc trắng
-
-        // Viền tua rua khăn bàn
-        ctx.fillStyle = '#fca5a5';
-        for (let i = 0; i < 10; i++) { ctx.fillRect(dx + 12 + i * 10, dy + dh - 8, 4, 4); ctx.fillRect(dx + 12 + i * 10, dy + 4, 4, 4); }
-
-        // Đĩa ăn & Dao nĩa
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.fillStyle = '#f1f5f9';
-        ctx.beginPath(); ctx.arc(dx + 32, dy + dh / 2, 12, 0, Math.PI * 2); ctx.fill(); // Đĩa trái
-        ctx.beginPath(); ctx.arc(dx + dw - 32, dy + dh / 2, 12, 0, Math.PI * 2); ctx.fill(); // Đĩa phải
-        // Bát súp (Soup bowl)
-        ctx.fillStyle = '#fef08a'; ctx.beginPath(); ctx.arc(dx + 32, dy + dh / 2, 6, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#fef08a'; ctx.beginPath(); ctx.arc(dx + dw - 32, dy + dh / 2, 6, 0, Math.PI * 2); ctx.fill();
-        
-        ctx.shadowColor = 'transparent';
-        ctx.fillStyle = '#cbd5e1'; // Dao nĩa kim loại
-        ctx.fillRect(dx + 14, dy + dh / 2 - 8, 2, 16); // Nĩa trái
-        ctx.fillRect(dx + 48, dy + dh / 2 - 8, 2, 16); // Dao trái
-        ctx.fillRect(dx + dw - 48, dy + dh / 2 - 8, 2, 16); // Nĩa phải
-        ctx.fillRect(dx + dw - 16, dy + dh / 2 - 8, 2, 16); // Dao phải
-
-        // Lọ hoa giữa bàn & Ly vang
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.fillStyle = '#38bdf8'; fillRoundRect(dx + dw / 2 - 6, dy + dh / 2 - 6, 12, 12, 6); // Lọ thuỷ tinh
-        ctx.shadowColor = 'transparent';
-        ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(dx + dw / 2, dy + dh / 2 - 8, 6, 0, Math.PI * 2); ctx.fill(); // Hoa đỏ
-        ctx.fillStyle = '#fb7185'; ctx.beginPath(); ctx.arc(dx + dw / 2 - 4, dy + dh / 2 - 10, 4, 0, Math.PI * 2); ctx.fill(); // Hoa phụ
-        // Ly vang đỏ
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'; ctx.beginPath(); ctx.arc(dx + 42, dy + dh / 2 - 12, 4, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'; ctx.beginPath(); ctx.arc(dx + dw - 42, dy + dh / 2 - 12, 4, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#be123c'; ctx.beginPath(); ctx.arc(dx + 42, dy + dh / 2 - 12, 2.5, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#be123c'; ctx.beginPath(); ctx.arc(dx + dw - 42, dy + dh / 2 - 12, 2.5, 0, Math.PI * 2); ctx.fill();
-
-        // ================= SOFA & BÀN TRÀ =================
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-        let sx = 17 * tileSize, sy = 18 * tileSize, sw = 4 * tileSize, sh = 3 * tileSize;
         let gradSofa = ctx.createLinearGradient(sx, sy, sx, sy + sh);
         gradSofa.addColorStop(0, '#ef4444'); gradSofa.addColorStop(0.5, '#dc2626'); gradSofa.addColorStop(1, '#991b1b');
         ctx.fillStyle = gradSofa;
-        fillRoundRect(sx, sy, sw, sh, 10);
+        fillRoundRect(sx, sy, sw, sh, 10); // Thân sofa
 
         ctx.shadowColor = 'transparent';
         ctx.fillStyle = '#7f1d1d'; fillRoundRect(sx + 4, sy + 4, sw - 8, sh * 0.4, 6); // Lưng tựa
-
-        // Tufting (Nút bấm trên lưng tựa sofa) tinh tế hơn
+        // Tufting (Nút bấm)
         ctx.fillStyle = '#450a0a';
         for (let c = 1; c < 6; c++) { 
            ctx.beginPath(); ctx.arc(sx + c * sw / 6, sy + 14, 2, 0, Math.PI * 2); ctx.fill(); 
         }
 
+        // Tay vịn
         ctx.fillStyle = '#7f1d1d';
-        fillRoundRect(sx - 2, sy + 8, 12, sh - 16, 4); // Tay trái
-        fillRoundRect(sx + sw - 10, sy + 8, 12, sh - 16, 4); // Tay phải
+        fillRoundRect(sx - 2, sy + 8, 12, sh - 16, 4); // Trái
+        fillRoundRect(sx + sw - 10, sy + 8, 12, sh - 16, 4); // Phải
 
-        // Gối tựa lông vũ
+        // Pink pillows
         ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.fillStyle = '#fca5a5';
+        ctx.fillStyle = '#f472b6';
         fillRoundRect(sx + 14, sy + 18, 18, 18, 4); // Gối 1
         fillRoundRect(sx + sw - 32, sy + 18, 18, 18, 4); // Gối 2
         ctx.shadowColor = 'transparent';
-        ctx.fillStyle = '#fecaca'; ctx.fillRect(sx + 16, sy + 20, 14, 2); ctx.fillRect(sx + sw - 30, sy + 20, 14, 2); // Highlight gối
+        ctx.fillStyle = '#fbcfe8'; 
+        ctx.fillRect(sx + 16, sy + 20, 14, 2); 
+        ctx.fillRect(sx + sw - 30, sy + 20, 14, 2); // Highlight
 
-        // Bàn trà kính (Glass Coffee Table) trước sofa
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        fillRoundRect(sx + 16, sy - 40, sw - 32, 24, 4);
-        ctx.shadowColor = 'transparent';
-        ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2; ctx.strokeRect(sx + 16, sy - 40, sw - 32, 24);
-        // Tạp chí trên bàn trà
-        ctx.fillStyle = '#38bdf8'; fillRoundRect(sx + 24, sy - 34, 12, 14, 1);
-        ctx.fillStyle = '#f8fafc'; fillRoundRect(sx + 28, sy - 34, 8, 14, 1);
-
-        // ================= TIVI & PS5 =================
+        // ================= DARK BLUE TV =================
+        let tvx = TV_X * tileSize, tvy = TV_Y * tileSize, tvw = TV_W * tileSize, tvh = TV_H * tileSize;
         ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        let tvx = 23 * tileSize, tvy = 15 * tileSize, tvw = 3 * tileSize, tvh = 1.5 * tileSize;
-        ctx.fillStyle = '#334155'; fillRoundRect(tvx, tvy, tvw, tvh, 4); // Kệ TV
-
+        ctx.fillStyle = '#1e3a8a'; // Dark blue body
+        fillRoundRect(tvx, tvy, tvw, tvh, 4); 
         ctx.shadowColor = 'transparent';
-        // Loa Soundbar & PS5
-        ctx.fillStyle = '#0f172a'; fillRoundRect(tvx + 10, tvy + tvh - 6, tvw - 20, 4, 2); // Soundbar
-        ctx.fillStyle = '#f8fafc'; fillRoundRect(tvx + tvw - 14, tvy + 4, 8, 20, 2); // PS5 thân
-        ctx.fillStyle = '#0f172a'; fillRoundRect(tvx + tvw - 11, tvy + 6, 2, 16, 1); // PS5 khe tản nhiệt
+        
+        ctx.fillStyle = '#0f172a'; // Khung viền đen trong
+        fillRoundRect(tvx + 4, tvy + 4, tvw - 8, tvh - 8, 2);
 
-        ctx.fillStyle = '#0f172a'; fillRoundRect(tvx + 4, tvy + 4, tvw - 24, tvh - 12, 2); // Khung TV
-
-        // Màn hình phát cảnh đồi đêm
+        // Landscape on TV
         const tvt = performance.now() / 1000;
-        ctx.fillStyle = '#172554'; ctx.fillRect(tvx + 6, tvy + 6, tvw - 28, tvh - 16); // Bầu trời
+        ctx.fillStyle = '#172554'; // Sky
+        ctx.fillRect(tvx + 6, tvy + 6, tvw - 12, tvh - 12); 
         
-        // Sao lấp lánh (Twinkling stars)
-        ctx.fillStyle = '#ffffff';
-        ctx.globalAlpha = Math.abs(Math.sin(tvt*2)); ctx.fillRect(tvx + 10, tvy + 8, 1, 1);
-        ctx.globalAlpha = Math.abs(Math.cos(tvt*1.5)); ctx.fillRect(tvx + 25, tvy + 10, 1, 1);
-        ctx.globalAlpha = Math.abs(Math.sin(tvt*3)); ctx.fillRect(tvx + 18, tvy + 14, 1, 1);
-        ctx.globalAlpha = 1.0;
-
-        ctx.fillStyle = '#fde047'; ctx.beginPath(); ctx.arc(tvx + 16, tvy + 12, 4, 0, Math.PI * 2); ctx.fill(); // Mặt trăng
+        // Moon
+        ctx.fillStyle = '#fde047'; 
+        ctx.beginPath(); ctx.arc(tvx + 20, tvy + 16, 6, 0, Math.PI * 2); ctx.fill();
         
-        // Đám mây trôi (Scrolling clouds)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-        let cloudX = (tvx + 6 + (tvt * 10) % (tvw - 28));
-        if (cloudX > tvx + tvw - 22) cloudX = tvx + 6; // Loop mây
-        ctx.beginPath(); ctx.arc(cloudX, tvy + 14, 3, 0, Math.PI * 2); ctx.arc(cloudX + 4, tvy + 14, 4, 0, Math.PI * 2); ctx.arc(cloudX + 8, tvy + 14, 3, 0, Math.PI * 2); ctx.fill();
-
+        // Hill
         ctx.fillStyle = '#166534';
-        ctx.beginPath(); ctx.moveTo(tvx + 6, tvy + tvh - 10); ctx.quadraticCurveTo(tvx + tvw / 2, tvy + 12, tvx + tvw - 22, tvy + tvh - 10); ctx.fill(); // Đồi cỏ
-        
-        // Ánh sáng toả ra từ màn hình TV (Glow)
+        ctx.beginPath(); 
+        ctx.moveTo(tvx + 6, tvy + tvh - 6); 
+        ctx.quadraticCurveTo(tvx + tvw / 2, tvy + 12, tvx + tvw - 6, tvy + tvh - 6); 
+        ctx.fill();
+
+        // Ánh sáng toả ra (Glow)
         ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
         ctx.beginPath(); ctx.arc(tvx + tvw / 2, tvy + tvh / 2, 40, 0, Math.PI * 2); ctx.fill();
 
-        // --- CÁC NỘI THẤT CHILL & HEALTHY THÊM VÀO ---
-        
-        // 2. Kệ sách góc tường (Chill)
-        ctx.fillStyle = '#5c402d';
-        ctx.fillRect(20 * tileSize, 13 * tileSize, 2 * tileSize, tileSize);
-        ctx.fillStyle = '#3b82f6'; ctx.fillRect(20 * tileSize + 4, 13 * tileSize + 4, 6, 12);
-        ctx.fillStyle = '#ef4444'; ctx.fillRect(20 * tileSize + 12, 13 * tileSize + 4, 8, 12);
-        ctx.fillStyle = '#22c55e'; ctx.fillRect(20 * tileSize + 24, 13 * tileSize + 4, 6, 12);
-        
-        // 3. Cây cảnh thư giãn
-        ctx.fillStyle = '#78350f'; ctx.fillRect(27 * tileSize + 8, 14 * tileSize + 8, 16, 24); // Chậu
-        ctx.fillStyle = '#22c55e'; ctx.beginPath(); ctx.arc(27 * tileSize + 16, 14 * tileSize + 4, 12, 0, Math.PI*2); ctx.fill(); // Lá
-        ctx.fillStyle = '#4ade80'; ctx.beginPath(); ctx.arc(27 * tileSize + 12, 14 * tileSize, 8, 0, Math.PI*2); ctx.fill();
-
-        // 4. Cửa chính (Đại sảnh ra vào lớn)
-        let doorX = 21 * tileSize, doorY = 23 * tileSize, doorW = 4 * tileSize;
-        
-        // Xóa tường cũ bằng cách vẽ nền đen (Void) để tạo khoảng trống cửa
-        ctx.fillStyle = '#000000'; 
-        ctx.fillRect(doorX, doorY, doorW, tileSize); 
-
-        // Vệt ánh sáng hắt từ ngoài vào trong nhà
-        let gradLight = ctx.createLinearGradient(doorX, doorY + 8, doorX, doorY - 40);
-        gradLight.addColorStop(0, 'rgba(253, 230, 138, 0.2)'); // Ánh sáng vàng ấm
-        gradLight.addColorStop(1, 'rgba(253, 230, 138, 0)');
-        ctx.fillStyle = gradLight;
-        ctx.beginPath(); 
-        ctx.moveTo(doorX, doorY + 8); 
-        ctx.lineTo(doorX + doorW, doorY + 8); 
-        ctx.lineTo(doorX + doorW + 20, doorY - 40); 
-        ctx.lineTo(doorX - 20, doorY - 40); 
-        ctx.fill();
-
-        // Thảm chùi chân Welcome lớn trong nhà
-        ctx.shadowColor = 'rgba(0,0,0,0.2)';
-        ctx.fillStyle = '#1e1b4b'; fillRoundRect(doorX + 16, doorY - 24, doorW - 32, 20, 4); // Thảm đậm
+        // ================= BROWN CONTROL PANEL =================
+        let pnx = PANEL_X * tileSize, pny = PANEL_Y * tileSize, pnw = PANEL_W * tileSize, pnh = PANEL_H * tileSize;
+        ctx.shadowColor = 'rgba(0,0,0,0.4)';
+        ctx.fillStyle = '#78350f'; // Nâu
+        fillRoundRect(pnx, pny, pnw, pnh, 4);
         ctx.shadowColor = 'transparent';
-        ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 1.5; ctx.strokeRect(doorX + 20, doorY - 20, doorW - 40, 12);
-        ctx.fillStyle = '#ffffff'; ctx.font = 'bold 10px "Courier New", monospace'; ctx.textAlign = 'center'; ctx.fillText('WELCOME', doorX + doorW/2, doorY - 11);
-
-        // Bậu cửa kim loại/đá
-        let gradThresh = ctx.createLinearGradient(doorX, doorY, doorX, doorY + 6);
-        gradThresh.addColorStop(0, '#f8fafc'); gradThresh.addColorStop(1, '#94a3b8');
-        ctx.fillStyle = gradThresh;
-        ctx.fillRect(doorX, doorY, doorW, 6);
-        ctx.fillStyle = '#475569'; ctx.fillRect(doorX, doorY + 6, doorW, 2); // Cạnh bậu cửa
-
-        // Khung cửa (cột) hai bên - Cân đối và gọn gàng
-        ctx.fillStyle = '#334155'; ctx.fillRect(doorX - 6, doorY, 6, 32);
-        ctx.fillStyle = '#475569'; ctx.fillRect(doorX - 3, doorY, 3, 32);
         
-        ctx.fillStyle = '#334155'; ctx.fillRect(doorX + doorW, doorY, 6, 32);
-        ctx.fillStyle = '#475569'; ctx.fillRect(doorX + doorW, doorY, 3, 32);
+        // 3 nút màu
+        ctx.fillStyle = '#3b82f6'; fillRoundRect(pnx + 8, pny + 8, 12, 12, 2); // Blue
+        ctx.fillStyle = '#ef4444'; fillRoundRect(pnx + 28, pny + 8, 12, 12, 2); // Red
+        ctx.fillStyle = '#22c55e'; fillRoundRect(pnx + 48, pny + 8, 12, 12, 2); // Green
 
-        // Cánh cửa mở thẳng ra ngoài (Nhìn từ trên xuống)
-        // Độ dày cửa = 6, Chiều dài = 54
-        // Cánh trái
-        ctx.fillStyle = '#451a03'; ctx.fillRect(doorX - 2, doorY + 8, 6, 54); 
-        ctx.fillStyle = '#78350f'; ctx.fillRect(doorX - 1, doorY + 8, 4, 52); 
-        ctx.fillStyle = '#fbbf24'; ctx.fillRect(doorX + 1, doorY + 54, 3, 4); // Tay nắm nhìn từ trên
-        
-        // Cánh phải
-        ctx.fillStyle = '#451a03'; ctx.fillRect(doorX + doorW - 4, doorY + 8, 6, 54);
-        ctx.fillStyle = '#78350f'; ctx.fillRect(doorX + doorW - 3, doorY + 8, 4, 52);
-        ctx.fillStyle = '#fbbf24'; ctx.fillRect(doorX + doorW - 4, doorY + 54, 3, 4); // Tay nắm
+        // ================= POTTED PLANT =================
+        let plx = PLANT_X * tileSize, ply = PLANT_Y * tileSize, plw = PLANT_W * tileSize, plh = PLANT_H * tileSize;
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.fillStyle = '#b45309'; // Chậu
+        fillRoundRect(plx + 16, ply + 32, 32, 24, 4); 
+        ctx.shadowColor = 'transparent';
+
+        // Lá cây
+        ctx.fillStyle = '#22c55e'; 
+        ctx.beginPath(); ctx.arc(plx + 32, ply + 24, 20, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#4ade80'; 
+        ctx.beginPath(); ctx.arc(plx + 26, ply + 16, 12, 0, Math.PI*2); ctx.fill();
 
         ctx.restore();
-
-        roomLayout.layout.forEach(item => {
-          if (['bed', 'desk', 'plant', 'laptop'].includes(item.type)) {
-            const customImg = window.customFurnitureSprites[item.type];
-            if (customImg && customImg.complete && customImg.width > 0) {
-              const rw = item.renderW || customImg.width;
-              const rh = item.renderH || customImg.height;
-              
-              // Đổ bóng (Drop shadow) cho nội thất 3D
-              ctx.save();
-              ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-              ctx.shadowOffsetY = 6;
-              ctx.shadowBlur = 10;
-              ctx.drawImage(customImg, item.x * tileSize, item.y * tileSize, rw, rh);
-              ctx.restore();
-            }
-          } else if (tilesetReady && roomLayout.tileset) {
-            const data = roomLayout.tileset[item.type];
-            if (data) {
-              ctx.drawImage(
-                tilesetImg,
-                data.sx, data.sy, data.sw, data.sh,
-                item.x * tileSize, item.y * tileSize, data.sw, data.sh
-              );
-            }
-          }
-        });
       }
 
       // Vẽ nội thất cơ bản cho các map khác
@@ -3112,17 +2884,15 @@ export default function GameCanvas() {
       let fNpc = null;
 
       if (currentLocation === 'home') {
-        // Trả lại vùng tương tác nguyên bản cho SVG gốc (ĐƯỢC MỞ RỘNG ĐỂ DỄ BẤM HƠN):
-        // PC (Laptop SVG) - mở rộng ra xung quanh bàn
-        if ((pGridX >= 2 && pGridX <= 9) && (pGridY >= 2 && pGridY <= 5)) fObj = { type: 'pc', label: 'Nhật ký · [E] Mở máy tính' };
-        // Giường (Bed SVG) - mở rộng ra cả 4 phía của giường (rất nhạy)
-        else if ((pGridX >= 3 && pGridX <= 8) && (pGridY >= 5 && pGridY <= 10)) fObj = { type: 'bed', label: 'Ngủ' };
-        // Cây (Plant SVG) - mở rộng xung quanh
-        else if ((pGridX >= 1 && pGridX <= 3) && (pGridY >= 1 && pGridY <= 4)) fObj = { type: 'plant', label: 'Tưới cây' };
-        else if (pGridX >= 24 && pGridX <= 31 && pGridY >= 2 && pGridY <= 7) fObj = { type: 'shower', label: 'Tắm rửa' };
-        else if (pGridX >= 1 && pGridX <= 4 && pGridY >= 13 && pGridY <= 17) fObj = { type: 'fridge', label: 'Mở tủ lạnh' };
-        else if (pGridX >= 5 && pGridX <= 10 && pGridY >= 16 && pGridY <= 20) fObj = { type: 'dining_table', label: 'Dùng bữa' };
-        else if ((pGridX >= 21 && pGridX <= 25 && pGridY >= 22) || (pGridX >= 7 && pGridX <= 10 && pGridY >= 11 && pGridY <= 13)) fObj = { type: 'door', label: '[E] Ra ngoài' };
+        const { SOFA_X, SOFA_Y, SOFA_W, SOFA_H, TV_X, TV_Y, TV_W, TV_H, PANEL_X, PANEL_Y, PANEL_W, PANEL_H, PLANT_X, PLANT_Y, PLANT_W, PLANT_H } = RoomConfig;
+        
+        // Mở rộng vùng tương tác 1 ô xung quanh object
+        const isNear = (x, y, w, h) => pGridX >= x - 1 && pGridX <= x + w && pGridY >= y - 1 && pGridY <= y + h;
+
+        if (isNear(PANEL_X, PANEL_Y, PANEL_W, PANEL_H)) fObj = { type: 'pc', label: 'Bảng điều khiển · [E]' };
+        else if (isNear(SOFA_X, SOFA_Y, SOFA_W, SOFA_H)) fObj = { type: 'bed', label: 'Nghỉ ngơi' };
+        else if (isNear(TV_X, TV_Y, TV_W, TV_H)) fObj = { type: 'door', label: '[E] Ra ngoài' };
+        else if (isNear(PLANT_X, PLANT_Y, PLANT_W, PLANT_H)) fObj = { type: 'plant', label: 'Tưới cây' };
       }
       else if (currentLocation === 'classroom') {
         if (pGridX >= 18 && pGridX <= 21 && pGridY >= 27) {
