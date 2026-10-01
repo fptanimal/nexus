@@ -1,4 +1,5 @@
 import React from 'react';
+import houseImg from '../assets/overload_house.png';
 
 export default function HouseBuilding() {
   return (
@@ -16,7 +17,7 @@ export default function HouseBuilding() {
       }}
     >
       <img 
-        src="/src/assets/overload_house.png" 
+        src={houseImg} 
         alt="House"
         style={{
           width: '100%',

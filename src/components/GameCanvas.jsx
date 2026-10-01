@@ -3168,6 +3168,7 @@ export default function GameCanvas() {
       cancelAnimationFrame(animationFrameId);
       clearInterval(interactionPoll);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapData, currentLocation, getVisibleNpcs, schedule.event]);
 
   return (
