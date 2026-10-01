@@ -1,160 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 
 export default function HouseBuilding() {
-  const canvasRef = useRef(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    
-    // Clear canvas
-    ctx.clearRect(0, 0, 256, 256);
-
-    // Absolutely NO smoothing
-    ctx.imageSmoothingEnabled = false;
-
-    // Helper for hard-edged outlines (1px thick now to match 1x1 scale)
-    const drawOutline = (x, y, w, h, outColor, inColor) => {
-      ctx.fillStyle = outColor;
-      ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
-      ctx.fillStyle = inColor;
-      ctx.fillRect(x, y, w, h);
-    };
-
-    // --- 1. Chimney ---
-    // x=188, y=8, w=24, h=60
-    drawOutline(188, 8, 24, 60, '#450a0a', '#ea580c');
-    // Chimney texture (flat 1x1 scale pixels)
-    ctx.fillStyle = '#c2410c';
-    for(let cy = 12; cy < 68; cy += 4) {
-       let offsetX = (cy % 8 === 0) ? 0 : 3;
-       for(let cx = 188 + offsetX; cx < 212; cx += 7) {
-          if (cx + 5 <= 212) {
-             ctx.fillRect(cx, cy, 5, 2);
-          }
-       }
-    }
-
-    // --- 2. Walls ---
-    // Wall box (centered, 216 wide, 192 high)
-    drawOutline(20, 64, 216, 192, '#450a0a', '#fef3c7');
-    
-    // ONE hard-edged vertical band of slightly darker shade for depth (NO GRADIENT)
-    ctx.fillStyle = '#fde68a';
-    ctx.fillRect(204, 64, 32, 192);
-    
-    // Base stone texture (bottom 16px) with 1px cracks
-    ctx.fillStyle = '#d6d3d1';
-    ctx.fillRect(20, 240, 216, 16); 
-    ctx.fillStyle = '#a8a29e'; // Darker stone flat lines (1px)
-    for(let y = 240; y < 256; y += 4) {
-       ctx.fillRect(20, y, 216, 1); // horizontal cracks
-       let offsetX = (y % 8 === 0) ? 0 : 4;
-       for(let x = 20 + offsetX; x < 236; x += 8) {
-          ctx.fillRect(x, y, 1, 4); // vertical cracks
-       }
-    }
-
-    // --- 3. Roof ---
-    // Stair-stepped trapezoid, perfectly flat colors
-    ctx.fillStyle = '#450a0a'; // Roof outline
-    
-    // Draw stair-stepped outline (1px steps)
-    for (let i = 0; i < 52; i++) {
-       // Left slope
-       ctx.fillRect(52 - i, 16 + i, 2, 1);
-       // Right slope
-       ctx.fillRect(202 + i, 16 + i, 2, 1);
-    }
-    // Roof top edge
-    ctx.fillRect(52, 15, 152, 1);
-    // Roof bottom edge
-    ctx.fillRect(0, 68, 256, 1);
-    
-    // Fill roof body
-    ctx.fillStyle = '#991b1b'; // Base red roof
-    for (let i = 0; i < 52; i++) {
-       ctx.fillRect(52 - i + 1, 16 + i, 150 + i*2, 1); // Fill inside the outline
-    }
-    
-    // Bottom flap of roof
-    ctx.fillStyle = '#7f1d1d';
-    ctx.fillRect(1, 65, 254, 3);
-    
-    // Roof texture (1-unit wide stripes, perfectly matching grass pixel scale)
-    ctx.fillStyle = '#7f1d1d';
-    for (let x = 4; x < 252; x += 4) {
-       for(let y = 17; y < 65; y++) {
-          let leftBound = 52 - (y - 16);
-          let rightBound = 204 + (y - 16);
-          if (x >= leftBound && x <= rightBound) {
-             ctx.fillRect(x, y, 1, 1); // 1px vertical line
-             // Horizontal tile separators every 6px, staggered
-             let isStaggered = (x % 8 === 0);
-             let yCheck = isStaggered ? (y % 6 === 0) : (y % 6 === 3);
-             if (yCheck && x + 3 <= rightBound) {
-                 ctx.fillRect(x, y, 4, 1); 
-             }
-          }
-       }
-    }
-
-    // --- 4. Windows ---
-    const drawWindow = (wx, wy) => {
-       drawOutline(wx, wy, 48, 48, '#450a0a', '#78350f'); // Window frame
-       
-       // Inner glass (Flat base color, NO diagonal gloss/gradient)
-       ctx.fillStyle = '#38bdf8';
-       ctx.fillRect(wx+2, wy+2, 44, 44);
-       
-       // Frame cross (2px thick)
-       ctx.fillStyle = '#78350f';
-       ctx.fillRect(wx+23, wy, 2, 48);
-       ctx.fillRect(wx, wy+23, 48, 2);
-       
-       // EXACTLY 2 small solid-color square highlight pixels (1x1 pixel-art style, no streak)
-       ctx.fillStyle = '#bae6fd'; // highlight flat color
-       // Top-left pane highlight
-       ctx.fillRect(wx+4, wy+4, 1, 1);
-       ctx.fillRect(wx+6, wy+4, 1, 1);
-       // Top-right pane highlight
-       ctx.fillRect(wx+26, wy+4, 1, 1);
-       ctx.fillRect(wx+28, wy+4, 1, 1);
-    };
-    drawWindow(40, 104); // Left window
-    drawWindow(168, 104); // Right window
-
-    // --- 5. Door ---
-    // Center is 128. Door width 64 => x=96
-    const dx = 96;
-    const dy = 168;
-    const dw = 64;
-    const dh = 72;
-    drawOutline(dx, dy, dw, dh, '#450a0a', '#78350f');
-    
-    // Door panels
-    ctx.fillStyle = '#451a03'; // Flat darker wood panels
-    // 1px borders for the panels to match the 1:1 scale
-    const drawPanel = (px, py, pw, ph) => {
-        ctx.fillRect(px, py, pw, 1);
-        ctx.fillRect(px, py+ph-1, pw, 1);
-        ctx.fillRect(px, py, 1, ph);
-        ctx.fillRect(px+pw-1, py, 1, ph);
-    };
-    drawPanel(dx+8, dy+8, 20, 28);
-    drawPanel(dx+36, dy+8, 20, 28);
-    drawPanel(dx+8, dy+40, 20, 24);
-    drawPanel(dx+36, dy+40, 20, 24);
-    
-    // Doorknob (single 2x2 flat pixel block)
-    ctx.fillStyle = '#fbbf24';
-    ctx.fillRect(dx+54, dy+38, 2, 2);
-    ctx.fillStyle = '#d97706';
-    ctx.fillRect(dx+55, dy+40, 1, 1); // Doorknob shadow
-
-  }, []);
-
   return (
     <div 
       className="origin-bottom-left"
@@ -162,19 +8,152 @@ export default function HouseBuilding() {
         width: '256px',
         height: '256px',
         zIndex: 10,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
         position: 'absolute'
       }}
     >
-      <canvas 
-        ref={canvasRef}
-        width={256}
-        height={256}
+      {/* Chimney */}
+      <div style={{
+          position: 'absolute',
+          top: '32px',
+          right: '48px',
+          width: '32px',
+          height: '64px',
+          backgroundColor: '#ea580c',
+          border: '4px solid #450a0a',
+          zIndex: 1
+      }}>
+          {/* flat detail lines to match pixel block texture */}
+          <div style={{ width: '100%', height: '4px', backgroundColor: '#c2410c', marginTop: '12px' }} />
+          <div style={{ width: '100%', height: '4px', backgroundColor: '#c2410c', marginTop: '16px' }} />
+      </div>
+
+      {/* Roof */}
+      <div 
         style={{
-          width: '100%',
-          height: '100%',
-          imageRendering: 'pixelated'
+          width: '90%', 
+          height: '80px',
+          backgroundColor: '#991b1b', // Red roof
+          border: '4px solid #450a0a',
+          borderBottom: 'none',
+          position: 'relative',
+          zIndex: 2,
+          // Pattern gạch / tấm ốp pixel (4px scale)
+          backgroundImage: `
+            linear-gradient(rgba(0, 0, 0, 0.1) 4px, transparent 4px),
+            linear-gradient(90deg, rgba(0, 0, 0, 0.1) 4px, transparent 4px)
+          `,
+          backgroundSize: '32px 32px'
         }}
-      />
+      >
+        {/* Roof bottom flap */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: '-4px', // extend over borders
+          width: 'calc(100% + 8px)',
+          height: '12px',
+          backgroundColor: '#7f1d1d',
+          border: '4px solid #450a0a'
+        }} />
+      </div>
+
+      {/* Main Walls */}
+      <div 
+        style={{
+          width: '80%',
+          height: '160px',
+          backgroundColor: '#fef3c7', // Cream
+          border: '4px solid #450a0a',
+          borderBottom: '4px solid #270606',
+          borderTop: 'none',
+          position: 'relative',
+          zIndex: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          boxShadow: 'inset -16px 0 0 rgba(0,0,0,0.05)',
+          // Pattern gạch / tấm ốp pixel
+          backgroundImage: `
+            linear-gradient(rgba(0, 0, 0, 0.03) 4px, transparent 4px),
+            linear-gradient(90deg, rgba(0, 0, 0, 0.03) 4px, transparent 4px)
+          `,
+          backgroundSize: '32px 32px'
+        }}
+      >
+        {/* Base stone layer */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          height: '24px',
+          backgroundColor: '#d6d3d1',
+          borderTop: '4px solid #450a0a',
+          backgroundImage: `
+            linear-gradient(rgba(0, 0, 0, 0.1) 4px, transparent 4px),
+            linear-gradient(90deg, rgba(0, 0, 0, 0.1) 4px, transparent 4px)
+          `,
+          backgroundSize: '16px 16px'
+        }} />
+
+        {/* Windows */}
+        <div style={{ display: 'flex', gap: '48px', marginTop: '32px', zIndex: 5 }}>
+            {[1, 2].map(i => (
+              <div key={i} style={{ 
+                  width: '48px', height: '48px', 
+                  backgroundColor: '#38bdf8', 
+                  border: '4px solid #450a0a', 
+                  position: 'relative',
+                  boxShadow: 'inset 4px 4px 0 rgba(0,0,0,0.1)'
+              }}>
+                  {/* Window Cross */}
+                  <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '4px', height: '100%', backgroundColor: '#450a0a' }} />
+                  <div style={{ position: 'absolute', top: '50%', left: 0, transform: 'translateY(-50%)', width: '100%', height: '4px', backgroundColor: '#450a0a' }} />
+                  {/* Highlight */}
+                  <div style={{ position: 'absolute', top: '4px', left: '4px', width: '8px', height: '8px', backgroundColor: '#bae6fd' }} />
+                  <div style={{ position: 'absolute', top: '4px', right: '4px', width: '8px', height: '8px', backgroundColor: '#bae6fd' }} />
+              </div>
+            ))}
+        </div>
+
+        {/* Door */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0, // sit on base
+          width: '64px',
+          height: '72px',
+          backgroundColor: '#78350f',
+          border: '4px solid #450a0a',
+          borderBottom: 'none',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 5
+        }}>
+           {/* Door panels */}
+           <div style={{ position: 'absolute', top: '8px', left: '8px', width: '20px', height: '24px', border: '4px solid #451a03' }} />
+           <div style={{ position: 'absolute', top: '8px', right: '8px', width: '20px', height: '24px', border: '4px solid #451a03' }} />
+           <div style={{ position: 'absolute', bottom: '8px', left: '8px', width: '20px', height: '24px', border: '4px solid #451a03' }} />
+           <div style={{ position: 'absolute', bottom: '8px', right: '8px', width: '20px', height: '24px', border: '4px solid #451a03' }} />
+           {/* Doorknob */}
+           <div style={{ position: 'absolute', top: '50%', right: '8px', width: '6px', height: '6px', backgroundColor: '#fbbf24' }} />
+        </div>
+      </div>
+      
+      {/* Lớp phủ Dither Pixel (để làm mịn hòa trộn khối) */}
+      <div style={pixelOverlayStyle} />
     </div>
   );
 }
+
+const pixelOverlayStyle = {
+  position: 'absolute', top: '0', left: 0, width: '100%', height: '100%',
+  pointerEvents: 'none', zIndex: 50,
+  backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='4'><rect width='2' height='2' fill='rgba(0,0,0,0.08)'/><rect x='2' y='2' width='2' height='2' fill='rgba(0,0,0,0.08)'/><rect x='2' y='0' width='2' height='2' fill='rgba(255,255,255,0.02)'/><rect x='0' y='2' width='2' height='2' fill='rgba(255,255,255,0.02)'/></svg>")`,
+  backgroundSize: '4px 4px',
+  mixBlendMode: 'overlay'
+};

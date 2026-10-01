@@ -987,36 +987,29 @@ export default function GameCanvas() {
           }),
 
           tree: createTex(32, 48, cx => {
-            // Bóng cây dưới mặt đất (nhạt hơn)
+            // Bóng cây dưới mặt đất
             cx.fillStyle = 'rgba(0,0,0,0.15)';
-            cx.beginPath(); cx.ellipse(16, 42, 12, 5, 0, 0, Math.PI * 2); cx.fill();
+            cx.fillRect(8, 40, 16, 4);
 
-            // Thân cây gỗ (màu gỗ ấm)
-            cx.fillStyle = '#8b5a2b'; cx.fillRect(12, 20, 8, 24);
-            cx.fillStyle = '#6b4423'; cx.fillRect(18, 20, 2, 24); // Đổ bóng bên phải
-            cx.fillStyle = '#a6723f'; cx.fillRect(12, 20, 1, 24); // Phản quang bên trái
+            // Thân cây (màu gỗ tối phẳng)
+            cx.fillStyle = '#451a03';
+            cx.fillRect(12, 28, 8, 12);
+            // Highlight góc thân cây nhẹ nhàng không gradient (blocky)
+            cx.fillStyle = '#78350f';
+            cx.fillRect(12, 28, 2, 12);
 
-            // Hàm vẽ 1 khóm lá 3D phong cách Pixel mềm mại
-            const drawLeafCluster = (x, y, r) => {
-              // Vòng tối (đáy)
-              cx.fillStyle = '#5eb82b';
-              cx.beginPath(); cx.arc(x, y + 2, r, 0, Math.PI * 2); cx.fill();
-              // Vòng cơ bản
-              cx.fillStyle = '#76d637';
-              cx.beginPath(); cx.arc(x, y, r, 0, Math.PI * 2); cx.fill();
-              // Vòng highlight rực rỡ
-              cx.fillStyle = '#9cf55b';
-              cx.beginPath(); cx.arc(x - 1, y - 1, r - 2, 0, Math.PI * 2); cx.fill();
-              // Điểm ảnh chói sáng
-              cx.fillStyle = '#c7ff96';
-              cx.fillRect(x - r * 0.4, y - r * 0.5, 3, 2);
-            };
-
-            // Lắp ráp các khóm lá tạo thành tán lá sum suê
-            drawLeafCluster(16, 12, 13); // Đỉnh cây
-            drawLeafCluster(9, 21, 10);  // Trái dưới
-            drawLeafCluster(23, 21, 10); // Phải dưới
-            drawLeafCluster(16, 23, 11); // Lấp khoảng trống giữa thân
+            // Tán lá khối vuông (Blocky leaves)
+            cx.fillStyle = '#14532d'; // Bóng lá dưới/outline
+            cx.fillRect(4, 4, 24, 24);
+            
+            cx.fillStyle = '#16a34a'; // Màu lá chính
+            cx.fillRect(4, 4, 20, 20);
+            
+            // Blocky highlight (màu lá sáng)
+            cx.fillStyle = '#4ade80';
+            cx.fillRect(4, 4, 8, 8);
+            cx.fillRect(12, 4, 4, 4);
+            cx.fillRect(4, 12, 4, 4);
           }),
 
           wall: createTex(32, 32, cx => {
