@@ -1,0 +1,84 @@
+
+=== classmate1 <- src/assets/classmate1_raw.png ===
+  detected 3 row bands: [0] y 23..251 | [1] y 425..665 | [2] y 797..1061
+    down c0: 160x229  magenta 14133px, fringe 3345px, shadow 122px, halo 0px
+    down c1: 160x229  magenta 14364px, fringe 3475px, shadow 115px, halo 0px
+    down c2: 160x229  magenta 14134px, fringe 3352px, shadow 117px, halo 0px
+    down c3: 160x229  magenta 14171px, fringe 3405px, shadow 118px, halo 0px
+    down c4: 160x229  magenta 14331px, fringe 3456px, shadow 111px, halo 0px
+    down c5: 160x229  magenta 14166px, fringe 3425px, shadow 108px, halo 0px
+    side c0: 160x241  magenta 17791px, fringe 2916px, shadow 201px, halo 0px
+    side c1: 160x241  magenta 17694px, fringe 2920px, shadow 210px, halo 0px
+    side c2: 160x241  magenta 17900px, fringe 2928px, shadow 216px, halo 0px
+    side c3: 160x241  magenta 17876px, fringe 2904px, shadow 216px, halo 0px
+    side c4: 160x241  magenta 17647px, fringe 2923px, shadow 223px, halo 0px
+    side c5: 160x241  magenta 17832px, fringe 2854px, shadow 211px, halo 0px
+  side row facing: c0..c2 = RIGHT, c3..c5 = LEFT (verified numerically + by eye)
+  side rows filled as [R0 R1 R2 R0 R1 R2] / [L0 L1 L2 L0 L1 L2]
+    up c0 <- src c0: 160x265  magenta 15996px, fringe 3303px, shadow 155px, halo 0px
+    up c1 <- src c1: 160x265  magenta 16050px, fringe 3296px, shadow 155px, halo 0px
+    up c2 <- src c2: 160x265  magenta 16013px, fringe 3377px, shadow 136px, halo 0px
+    up c3 <- src c3: 160x265  magenta 16004px, fringe 3336px, shadow 123px, halo 0px
+    up c4 <- src c4: 160x265  magenta 15995px, fringe 3400px, shadow 148px, halo 0px
+    up c5 <- src c4: 160x265  magenta 15995px, fringe 3400px, shadow 148px, halo 0px
+  up row column map: [0, 1, 2, 3, 4, 4]
+  source body height per row: down=228 left=240 right=240 up=264
+  row scale factors: down=0.833 left=0.792 right=0.792 up=0.720
+  wrote src/assets/classmate1_final.png  912x800  cell 152x200
+  character 190px in a 200px cell -> 39.9px tall on screen
+
+=== classmate2 <- src/assets/classmate2_raw.png ===
+  detected 4 row bands: [0] y 38..278 | [1] y 327..550 | [2] y 569..778 | [3] y 793..1064
+    down c0: 160x241  magenta 14220px, fringe 2290px, shadow 131px, halo 0px
+    down c1: 160x241  magenta 14196px, fringe 2295px, shadow 105px, halo 0px
+    down c2: 160x241  magenta 14203px, fringe 2257px, shadow 118px, halo 0px
+    down c3: 160x241  magenta 14181px, fringe 2256px, shadow 114px, halo 0px
+    down c4: 160x241  magenta 14213px, fringe 2253px, shadow 119px, halo 0px
+    down c5: 160x241  magenta 14225px, fringe 2184px, shadow 97px, halo 0px
+    side c0: 160x224  magenta 15940px, fringe 2140px, shadow 188px, halo 0px
+    side c1: 160x224  magenta 15824px, fringe 2175px, shadow 164px, halo 0px
+    side c2: 160x224  magenta 15910px, fringe 2156px, shadow 180px, halo 0px
+    side c3: 160x224  magenta 15927px, fringe 2125px, shadow 181px, halo 0px
+    side c4: 160x224  magenta 15808px, fringe 2151px, shadow 198px, halo 0px
+    side c5: 160x224  magenta 15881px, fringe 2160px, shadow 188px, halo 0px
+  side row facing: c0..c2 = RIGHT, c3..c5 = LEFT (verified numerically + by eye)
+  side rows filled as [R0 R1 R2 R0 R1 R2] / [L0 L1 L2 L0 L1 L2]
+    up c0 <- src c0: 160x272  magenta 14032px, fringe 2613px, shadow 140px, halo 0px
+    up c1 <- src c1: 160x272  magenta 13913px, fringe 2830px, shadow 164px, halo 0px
+    up c2 <- src c2: 160x272  magenta 14103px, fringe 2632px, shadow 124px, halo 0px
+    up c3 <- src c3: 160x272  magenta 14127px, fringe 2651px, shadow 112px, halo 0px
+    up c4 <- src c4: 160x272  magenta 13846px, fringe 2946px, shadow 118px, halo 0px
+    up c5 <- src c5: 160x272  magenta 13675px, fringe 2789px, shadow 77px, halo 0px
+  up row column map: [0, 1, 2, 3, 4, 5]
+  source body height per row: down=240 left=223 right=223 up=272
+  row scale factors: down=0.792 left=0.852 right=0.852 up=0.699
+  wrote src/assets/classmate2_final.png  912x800  cell 152x200
+  character 190px in a 200px cell -> 39.9px tall on screen
+
+=== classmate3 <- src/assets/classmate3_raw.png ===
+  detected 3 row bands: [0] y 28..338 | [1] y 382..709 | [2] y 763..1084
+    down c0: 160x311  magenta 16848px, fringe 2809px, shadow 149px, halo 0px
+    down c1: 160x311  magenta 16889px, fringe 2783px, shadow 150px, halo 0px
+    down c2: 160x311  magenta 16847px, fringe 2797px, shadow 141px, halo 0px
+    down c3: 160x311  magenta 16853px, fringe 2781px, shadow 159px, halo 0px
+    down c4: 160x311  magenta 16859px, fringe 2763px, shadow 154px, halo 0px
+    down c5: 160x311  magenta 16853px, fringe 2743px, shadow 136px, halo 0px
+    side c0: 160x328  magenta 19377px, fringe 3200px, shadow 296px, halo 0px
+    side c1: 160x328  magenta 19439px, fringe 3235px, shadow 239px, halo 0px
+    side c2: 160x328  magenta 19181px, fringe 3262px, shadow 289px, halo 0px
+    side c3: 160x328  magenta 19225px, fringe 3245px, shadow 282px, halo 0px
+    side c4: 160x328  magenta 19597px, fringe 3131px, shadow 264px, halo 0px
+    side c5: 160x328  magenta 19205px, fringe 3262px, shadow 288px, halo 0px
+  side row facing: c0..c2 = RIGHT, c3..c5 = LEFT (verified numerically + by eye)
+  side rows filled as [R0 R1 R2 R0 R1 R2] / [L0 L1 L2 L0 L1 L2]
+    up c0 <- src c0: 160x322  magenta 16762px, fringe 2784px, shadow 184px, halo 0px
+    up c1 <- src c1: 160x322  magenta 17166px, fringe 2811px, shadow 154px, halo 0px
+    up c2 <- src c2: 160x322  magenta 17207px, fringe 2843px, shadow 157px, halo 0px
+    up c3 <- src c3: 160x322  magenta 17166px, fringe 2913px, shadow 133px, halo 0px
+    up c4 <- src c4: 160x322  magenta 17196px, fringe 2825px, shadow 168px, halo 0px
+    up c5 <- src c4: 160x322  magenta 17196px, fringe 2825px, shadow 168px, halo 0px
+  up row column map: [0, 1, 2, 3, 4, 4]
+  source body height per row: down=310 left=327 right=327 up=320
+  row scale factors: down=0.613 left=0.581 right=0.581 up=0.594
+  wrote src/assets/classmate3_final.png  912x800  cell 152x200
+  character 190px in a 200px cell -> 39.9px tall on screen

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { background: #fff; padding: 20px; }
+        .green-bg { background: #00FF00; }
+        canvas { border: 1px solid #ccc; margin: 10px; image-rendering: pixelated; width: 64px; height: 128px; }
+        .container { display: flex; flex-direction: column; gap: 20px; }
+        .row { display: flex; gap: 10px; align-items: center; }
+    </style>
+</head>
+<body>
+    <div class="container" id="app"></div>
+    <script>
+        const sprites = ['classmate1.png', 'classmate2.png', 'classmate3.png'];
+        const app = document.getElementById('app');
+
+        sprites.forEach((src, i) => {
+            const row = document.createElement('div');
+            row.className = 'row ' + (i % 2 === 0 ? 'green-bg' : '');
+            
+            const img = new Image();
+            img.src = './src/assets/' + src;
+            img.onload = () => {
+                const frameW = img.width / 6;
+                const frameH = img.height / 3;
+
+                const dirs = ['down', 'right', 'left', 'up'];
+                dirs.forEach((dir) => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 32;
+                    canvas.height = 64;
+                    const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = false;
+                    row.appendChild(canvas);
+
+                    let t = 0;
+                    setInterval(() => {
+                        ctx.clearRect(0, 0, 32, 64);
+                        t += 0.15;
+                        
+                        let sRow = 0;
+                        let sCol = 0;
+                        
+                        if (dir === 'down') sRow = 0;
+                        else if (dir === 'left' || dir === 'right') sRow = 1;
+                        else if (dir === 'up') sRow = 2;
+                        
+                        if (dir === 'right') sCol = Math.floor(t) % 3;
+                        else if (dir === 'left') sCol = 3 + (Math.floor(t) % 3);
+                        else sCol = Math.floor(t) % 6;
+
+                        const drawW = 32;
+                        const drawH = (frameH / frameW) * drawW;
+
+                        ctx.drawImage(img, sCol * frameW, sRow * frameH, frameW, frameH, 0, 64 - drawH, drawW, drawH);
+                    }, 1000 / 60);
+                });
+            };
+            app.appendChild(row);
+        });
+    </script>
+</body>
+</html>

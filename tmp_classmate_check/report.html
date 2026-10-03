@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Classmate sprites — kiểm tra trong game</title>
+<style>
+  body{font-family:ui-sans-serif,system-ui,"Segoe UI",sans-serif;background:#0f172a;color:#e2e8f0;margin:0;padding:24px}
+  h1{font-size:20px;margin:0 0 4px} h2{font-size:15px;margin:28px 0 8px;color:#a5b4fc}
+  p{font-size:13px;line-height:1.6;color:#cbd5e1;margin:4px 0}
+  .card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px;margin-bottom:18px}
+  img{display:block;max-width:100%;image-rendering:pixelated;border-radius:6px}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>div{flex:1 1 320px;min-width:280px}
+  code{background:#0f172a;padding:2px 6px;border-radius:4px;font-size:12px}
+</style></head><body>
+<h1>3 bạn học — kiểm tra sprite trong game</h1>
+<p>Toàn bộ ảnh dưới đây lấy <b>trực tiếp từ canvas của game</b> đang chạy (không phải ảnh dàn dựng), nên đúng là những gì người chơi nhìn thấy.</p>
+
+<div class="card">
+  <h2>1. Trong lớp học (thay 3 bóng đen cũ)</h2>
+  <img src="classroom_full.png" alt="classroom">
+  <p>Bản đồ lớp 40×30 ô. Ba bạn: Nam <code>classmate1</code> (4,10), Hoa <code>classmate2</code> (12,14), Tuấn <code>classmate3</code> (6,22) — đều quay <code>up</code> (nhìn lên bảng).</p>
+</div>
+
+<div class="card">
+  <h2>2. Cận cảnh chỗ ngồi (2×)</h2>
+  <img src="desks_zoom.png" alt="desks">
+</div>
+
+<div class="card">
+  <h2>3. Bốn hướng đi (4×)</h2>
+  <div class="row">
+    <div><p><b>XUỐNG (nhìn thẳng)</b></p><img src="dir_down.png" alt="down"></div><div><p><b>TRÁI</b></p><img src="dir_left.png" alt="left"></div><div><p><b>PHẢI</b></p><img src="dir_right.png" alt="right"></div><div><p><b>LÊN (nhìn sau lưng)</b></p><img src="dir_up.png" alt="up"></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>4. Chu kỳ đi — 4 hướng × 3 tư thế chân</h2>
+  <img src="anim_grid.png" alt="anim grid">
+  <p>Mỗi hàng là một hướng, ba cột là ba khung pose (chân trái bước → chân phải bước → về vị trí). Cả ba nhân vật đổi tư thế chân giữa các cột.</p>
+</div>
+
+<div class="card">
+  <h2>5. Sheet gốc đã xử lý (3×, nền sáng)</h2>
+  <img src="final_sheets_3x.png" alt="sheets">
+  <p>Không còn pixel hồng/magenta, không còn vệt sao watermark ở góc dưới-phải hàng 3.</p>
+</div>
+</body></html>

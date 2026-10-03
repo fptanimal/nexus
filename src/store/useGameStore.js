@@ -58,21 +58,12 @@ const MAPS = {
     // --- KHU VỰC TRƯỜNG HỌC (Góc trên phải) ---
     // Khu vực trường học hiện tại nằm từ cột 21 đến 29, hàng 0 đến 8
     // --- KHU VỰC TRƯỜNG HỌC (Góc trên phải) ---
-    // Xây dựng một khuôn viên trường học với hàng rào và sân bê tông (tile 7)
-    // Khuôn viên từ cột 16 đến 28, hàng 1 đến 12
-    for (let r = 1; r <= 12; r++) {
-      for (let c = 16; c <= 28; c++) {
-        // Tường rào xung quanh
-        if (r === 1 || r === 12 || c === 16 || c === 28) {
-          m[r][c] = 1; 
-        } else {
-          m[r][c] = 7; // Sân bê tông trường học
-        }
-      }
-    }
+    // Tường rào và sân bê tông trường học đã bị xóa
     
-    // Cổng trường (phá tường ở dưới)
-    m[12][21] = 5; m[12][22] = 5; m[12][23] = 5;
+    // Đường dẫn dọc lên cổng trường (kéo dài lên sát mép cửa)
+    for (let r = 11; r <= 12; r++) {
+      m[r][21] = 5; m[r][22] = 5; m[r][23] = 5;
+    }
 
     // Đường dẫn dọc lên cổng trường
     for (let r = 13; r <= 16; r++) {
@@ -86,33 +77,37 @@ const MAPS = {
       m[16][c] = 5;
     }
 
-    // (Đã xóa Khối va chạm toà nhà trường học theo yêu cầu)
-
+    // Khối va chạm toà nhà trường học (footprint)
+    for (let r = 4; r <= 10; r++) {
+      for (let c = 18; c <= 26; c++) {
+        // Trừ khoảng hở chỗ cửa ra vào
+        if (r === 10 && c >= 21 && c <= 23) continue;
+        m[r][c] = 9;
+      }
+    }
     // --- KHU VỰC THƯ VIỆN (Góc phải) ---
-    // Khuôn viên thư viện nhỏ lại
-    for (let r = 5; r <= 16; r++) {
-      for (let c = 32; c <= 42; c++) {
-        // Hàng rào xung quanh
-        if (r === 5 || r === 16 || c === 32 || c === 42) {
-          m[r][c] = 1; // Tường rào
-        } else {
-          m[r][c] = 7; // Sân bê tông
-        }
+    // (Xoá nền đá/tường rào cũ, chỉ để cỏ)
+    
+    // Khối va chạm toà nhà thư viện (footprint: c=34..40, r=9..13)
+    for (let r = 8; r <= 13; r++) {
+      for (let c = 34; c <= 40; c++) {
+        // Trừ khoảng hở chỗ cửa ra vào
+        if (r === 13 && c >= 36 && c <= 38) continue;
+        m[r][c] = 9;
       }
     }
 
-    // Cổng vào thư viện
-    m[16][36] = 5; m[16][37] = 5; m[16][38] = 5;
-
-    // (Đã xóa Khối va chạm toà nhà thư viện theo yêu cầu)
-
-    // Cây trong sân thư viện
+    // Cây trang trí quanh thư viện (ngoài tòa nhà)
     m[6][33] = 4; m[6][41] = 4; m[15][33] = 4; m[15][41] = 4;
 
     // Đường nối từ đường chính đến cổng thư viện (ngang)
-    for (let c = 12; c <= 35; c++) {
+    for (let c = 12; c <= 38; c++) {
       m[16][c] = 5;
       m[17][c] = 5;
+    }
+    // Lên cửa thư viện
+    for (let r = 13; r <= 15; r++) {
+      m[r][36] = 5; m[r][37] = 5; m[r][38] = 5;
     }
 
     // Cây rải rác ở bãi cỏ giữa trường và thư viện
@@ -373,10 +368,10 @@ const useGameStore = create((set, get) => ({
 
   // ── NPC System ──
   npcs: [
-    { id: 'teacher1', name: 'Cô Giáo', x: 8, y: 3, color: 'bg-indigo-500', locations: ['classroom'], dialogue: 'Các em chú ý nghe giảng nhé! Đừng nói chuyện riêng.', facing: 'down' },
-    { id: 'student1', name: 'Nam', x: 4, y: 10, color: 'bg-green-500', locations: ['classroom'], dialogue: 'Trời ơi, bài toán này khó quá đi mất...', facing: 'up', sitting: true },
-    { id: 'student2', name: 'Hoa', x: 12, y: 14, color: 'bg-yellow-400', locations: ['classroom'], dialogue: 'Cậu làm xong bài chưa? Cho tớ chép với!', facing: 'up', sitting: true },
-    { id: 'student3', name: 'Tuấn', x: 6, y: 22, color: 'bg-red-400', locations: ['classroom'], dialogue: 'Tối nay về chơi game không? Tớ rảnh lắm!', facing: 'up', sitting: true },
+    { id: 'teacher1', name: 'Cô Giáo', x: 8, y: 3, spriteSheet: 'teacher', color: 'bg-indigo-500', locations: ['classroom'], dialogue: 'Các em chú ý nghe giảng nhé! Đừng nói chuyện riêng.', facing: 'down' },
+    { id: 'student1', name: 'Nam', x: 4, y: 10, spriteSheet: 'classmate1', color: 'bg-green-500', locations: ['classroom'], dialogue: 'Bài tập hôm nay hơi khó nhỉ, cậu làm xong chưa?', facing: 'down', isWandering: true },
+    { id: 'student2', name: 'Hoa', x: 12, y: 10, spriteSheet: 'classmate2', color: 'bg-yellow-400', locations: ['classroom'], dialogue: 'Trời ơi, tớ buồn ngủ quá. Cậu có mang theo kẹo không?', facing: 'down', isWandering: true },
+    { id: 'student3', name: 'Tuấn', x: 5, y: 14, spriteSheet: 'classmate3', color: 'bg-red-400', locations: ['classroom'], dialogue: 'Lát nữa học xong đi đá bóng không cậu?', facing: 'down', isWandering: true },
     { id: 'doctor', name: 'Bác Sĩ', x: 10, y: 15, color: 'bg-white', locations: ['hospital_room'], dialogue: 'Chào bạn, dạo này bạn có thấy áp lực quá không? Cố gắng nghỉ ngơi nhé.', facing: 'down', customAiSprite: true, isWandering: true },
     { id: 'patient1', name: 'Bệnh Nhân A', x: 3, y: 2, color: 'bg-slate-400', locations: ['hospital_room'], dialogue: '...mình mệt quá...', facing: 'down', sitting: true },
     { id: 'patient2', name: 'Bệnh Nhân B', x: 25, y: 7, color: 'bg-slate-400', locations: ['hospital_room'], dialogue: 'Đầu mình đau như búa bổ, không nghĩ được gì cả.', facing: 'down', sitting: true },
@@ -482,8 +477,8 @@ const useGameStore = create((set, get) => ({
     
     // Ba mẹ xuất hiện sau 19:00 (7 PM)
     if (time >= 19 * 60 || time < 7 * 60) {
-      visible.push({ id: 'ba', name: 'Ba', x: 23, y: 15, color: 'bg-gray-400', locations: ['home'], dialogue: 'Học bài đi con, đừng chơi game muộn quá nhé.' });
-      visible.push({ id: 'me', name: 'Mẹ', x: 6, y: 15, color: 'bg-pink-400', locations: ['home'], dialogue: 'Xuống ăn cơm đi con, mẹ nấu xong rồi đây.' });
+      visible.push({ id: 'ba', name: 'Ba', x: 23, y: 15, spriteSheet: 'father', color: 'bg-gray-400', locations: ['home'], dialogue: 'Học bài đi con, đừng chơi game muộn quá nhé.' });
+      visible.push({ id: 'me', name: 'Mẹ', x: 6, y: 15, spriteSheet: 'mother', color: 'bg-pink-400', locations: ['home'], dialogue: 'Xuống ăn cơm đi con, mẹ nấu xong rồi đây.' });
     }
     return visible;
   },
@@ -505,7 +500,7 @@ const useGameStore = create((set, get) => ({
       inGameTime: 7 * 60,
       currentDay: 1,
       currentLocation: 'home',
-      playerPos: { x: 23, y: 20, facing: 'up' },
+      playerPos: { x: 23, y: 20, facing: 'down' },
       
       // Trạng thái trị liệu
       intrusiveThought: null,

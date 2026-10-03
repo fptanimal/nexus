@@ -6,7 +6,19 @@ import SchoolOverlay from './SchoolOverlay';
 import LibraryBuilding from './LibraryBuilding';
 import HospitalBuilding from './HospitalBuilding';
 import HouseBuilding from './HouseBuilding';
+import fatherSpritesheetUrl from '../assets/father_final.png';
+import motherSpritesheetUrl from '../assets/mother_final.png';
+import teacherSpritesheetUrl from '../assets/teacher_final.png';
+import classmate1SpritesheetUrl from '../assets/classmate1.png';
+import classmate2SpritesheetUrl from '../assets/classmate2.png';
+import classmate3SpritesheetUrl from '../assets/classmate3.png';
 
+window.__fatherSpritesheetSrc = fatherSpritesheetUrl;
+window.__motherSpritesheetSrc = motherSpritesheetUrl;
+window.__teacherSpritesheetSrc = teacherSpritesheetUrl;
+window.__classmate1SpritesheetSrc = classmate1SpritesheetUrl;
+window.__classmate2SpritesheetSrc = classmate2SpritesheetUrl;
+window.__classmate3SpritesheetSrc = classmate3SpritesheetUrl;
 const rawTilesetImg = new Image();
 const tilesetImg = document.createElement('canvas');
 let tilesetReady = false;
@@ -601,7 +613,18 @@ export default function GameCanvas() {
           setNearbyNpc(npc => {
             if (npc) {
               audioSystem.playClick();
-              if (npc.id === 'doctor1') {
+              // Make NPC face the player
+              const pX = posRef.current.x;
+              const pY = posRef.current.y;
+              const nX = npc.x * tileSize;
+              const nY = npc.y * tileSize;
+              if (Math.abs(pX - nX) > Math.abs(pY - nY)) {
+                npc.facing = pX > nX ? 'right' : 'left';
+              } else {
+                npc.facing = pY > nY ? 'down' : 'up';
+              }
+              
+              if (npc.id === 'doctor1' || npc.id === 'doctor') {
                 useGameStore.getState().openHospitalModal();
               } else {
                 startDialogue(npc.id);
@@ -861,9 +884,15 @@ export default function GameCanvas() {
       }
 
       // 1.5 Update NPC AI
+      const activeDialogue = useGameStore.getState().activeDialogue;
       const visibleNpcsForAi = useGameStore.getState().npcs;
       visibleNpcsForAi.forEach(npc => {
         if (npc.isWandering && npc.locations && npc.locations.includes(currentLocation)) {
+          if (activeDialogue === npc.id) {
+            npc.walkTimer = 0;
+            return; // Pause wandering while in conversation
+          }
+
           if (!npc._ai) {
              npc._ai = { state: 'idle', timer: Math.random() * 2000, targetX: npc.x, targetY: npc.y };
           }
@@ -873,11 +902,62 @@ export default function GameCanvas() {
             npc.walkTimer = 0;
             if (ai.timer <= 0) {
                ai.state = 'walking';
-               // Chọn một giường bệnh ngẫu nhiên
-               const beds = [{x: 4, y: 14}, {x: 4, y: 7}, {x: 4, y: 19}, {x: 23, y: 3}];
-               const target = beds[Math.floor(Math.random() * beds.length)];
-               ai.targetX = target.x;
-               ai.targetY = target.y;
+               // Chọn một ô liền kề (trên, dưới, trái, phải) để tránh đi xuyên tường/bàn
+               const dirs = [
+                 {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
+               ];
+               // Xáo trộn mảng dirs
+               for (let i = dirs.length - 1; i > 0; i--) {
+                 const j = Math.floor(Math.random() * (i + 1));
+                 [dirs[i], dirs[j]] = [dirs[j], dirs[i]];
+               }
+               
+               let found = false;
+               const playerGridX = Math.floor(useGameStore.getState().playerPos.x / tileSize);
+               const playerGridY = Math.floor(useGameStore.getState().playerPos.y / tileSize);
+               
+               for (const dir of dirs) {
+                 const rx = Math.round(npc.x) + dir.dx;
+                 const ry = Math.round(npc.y) + dir.dy;
+                 
+                 if (rx >= 1 && rx < cols - 1 && ry >= 1 && ry < rows - 1) {
+                   const px = rx * tileSize;
+                   const py = ry * tileSize;
+                   const targetHitbox = { left: px + 6, right: px + 26, top: py + 16, bottom: py + 30 };
+                   
+                   // Use the EXACT SAME collision logic as the player
+                   const isColliding = checkCollision(targetHitbox.left, targetHitbox.top) || 
+                                       checkCollision(targetHitbox.right, targetHitbox.top) || 
+                                       checkCollision(targetHitbox.left, targetHitbox.bottom) || 
+                                       checkCollision(targetHitbox.right, targetHitbox.bottom);
+
+                   if (!isColliding) {
+                     // Tránh ô người chơi đang đứng
+                     if (rx === playerGridX && ry === playerGridY) continue;
+                     
+                     // Tránh ô NPC khác đang đứng (hoặc đang hướng tới)
+                     let isOccupied = false;
+                     visibleNpcsForAi.forEach(otherNpc => {
+                       if (otherNpc.id !== npc.id) {
+                         const ox = Math.round(otherNpc._ai?.targetX ?? otherNpc.x);
+                         const oy = Math.round(otherNpc._ai?.targetY ?? otherNpc.y);
+                         if (rx === ox && ry === oy) isOccupied = true;
+                       }
+                     });
+                     
+                     if (!isOccupied) {
+                       ai.targetX = rx;
+                       ai.targetY = ry;
+                       found = true;
+                       break;
+                     }
+                   }
+                 }
+               }
+               if (!found) {
+                 ai.state = 'idle';
+                 ai.timer = 1000;
+               }
             }
           } else if (ai.state === 'walking') {
             const dx = ai.targetX - npc.x;
@@ -887,14 +967,13 @@ export default function GameCanvas() {
             if (dist < 0.1) {
                npc.x = ai.targetX;
                npc.y = ai.targetY;
-               npc.facing = npc.x > 15 ? 'right' : 'left'; // Quay mặt vào giường
                ai.state = 'idle';
-               ai.timer = 3000 + Math.random() * 4000;
+               ai.timer = 2000 + Math.random() * 3000;
             } else {
-               const speed = 0.08;
+               const speed = 0.04; // Tốc độ thong thả (chậm hơn so với 0.08)
                npc.x += (dx / dist) * speed;
                npc.y += (dy / dist) * speed;
-               npc.walkTimer = (npc.walkTimer || 0) + 0.15;
+               npc.walkTimer = (npc.walkTimer || 0) + 0.1;
                
                if (Math.abs(dx) > Math.abs(dy)) {
                  npc.facing = dx > 0 ? 'right' : 'left';
@@ -1140,8 +1219,8 @@ export default function GameCanvas() {
 
           if (preRenderedSprites.floor && currentLocation !== 'home') ctx.drawImage(preRenderedSprites.floor, tx, ty);
 
-          // Cỏ (8)
-          if (t === 8) {
+          // Cỏ (8) và nền toà nhà (9)
+          if (t === 8 || t === 9) {
             ctx.drawImage(window.proceduralPatterns.grass, tx, ty);
           }
           // Đường đi (5)
@@ -1154,8 +1233,8 @@ export default function GameCanvas() {
             // Cây có chiều cao 48px, nên vẽ lùi lên một chút để thân cắm xuống đúng ô
             ctx.drawImage(window.proceduralPatterns.tree, tx, ty - 16);
           }
-          // Sân trường (Bê tông - 7) và Khối va chạm toà nhà (9)
-          if (t === 7 || (t === 9 && currentLocation === 'main')) {
+          // Sân trường (Bê tông - 7)
+          if (t === 7) {
             ctx.drawImage(window.proceduralPatterns.concrete, tx, ty);
           }
 
@@ -2253,8 +2332,8 @@ export default function GameCanvas() {
         const phase = logicX * 13 + logicY * 7;
         let moveOffset = Math.sin((t + phase * 100) / 800) * 8; // Pacing range reduced
         
-        // Giáo viên đứng yên khi đang dạy
-        if (npc.id === 'teacher1' && isClassTime) moveOffset = 0;
+        // Giáo viên đứng yên khi đang dạy; sitting NPCs stay perfectly still
+        if ((npc.id === 'teacher1' && isClassTime) || npc.sitting) moveOffset = 0;
 
         const direction = Math.cos((t + phase * 100) / 800) > 0 ? 1 : -1;
 
@@ -2299,31 +2378,72 @@ export default function GameCanvas() {
         const sittingOffset = npc.sitting ? 4 : 0;
         ctx.translate(nx + 16, ny + 28 + sittingOffset); // Origin at bottom center
 
-        // Shadow
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 10, 4, 0, 0, Math.PI * 2);
-        ctx.fill();
+        // Shadow — skip for sitting NPCs (shadow would be hidden under the desk)
+        if (!npc.sitting) {
+          ctx.fillStyle = 'rgba(0,0,0,0.4)';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 10, 4, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
 
         if (npc.spriteSheet) {
           const sheetImg = window.customPlayerSprites && window.customPlayerSprites[npc.spriteSheet];
           if (sheetImg && sheetImg.complete && sheetImg.width > 0) {
-            const frameW = sheetImg.width / 4;
-            const frameH = sheetImg.height / 4;
+            let frameCount = 4;
+            let rowCount = 4;
+            // father / teacher dùng sheet 6 cột x 4 hàng (3 pose lặp 2 lần)
+            if (npc.spriteSheet === 'father' || npc.spriteSheet === 'teacher') {
+              frameCount = 6;
+              rowCount = 4;
+            } else if (npc.spriteSheet.startsWith('classmate')) {
+              // classmate: 3 rows, 6 columns
+              frameCount = 6;
+              rowCount = 3;
+            }
+            const frameW = sheetImg.width / frameCount;
+            const frameH = sheetImg.height / rowCount;
+            // Cô Giáo là NPC duy nhất quay theo chiều đang bước: khi lên bục giảng thì
+            // quay xuống (đứng yên), lúc đi qua đi lại thì quay theo hướng đi.
+            const sheetFacing = npc.id === 'teacher1'
+              ? (isClassTime ? 'down' : (direction > 0 ? 'right' : 'left'))
+              : npc.facing;
             let row = 0;
-            if (npc.facing === 'left') row = 1;
-            else if (npc.facing === 'right') row = 2;
-            else if (npc.facing === 'up') row = 3;
-            
             let col = 0; // stand
-            if (npc.walkTimer > 0) {
-              const cycle = Math.floor(npc.walkTimer) % 4;
-              col = cycle; // 0, 1, 2, 3
+            
+            if (npc.spriteSheet.startsWith('classmate')) {
+              if (sheetFacing === 'down') row = 0;
+              else if (sheetFacing === 'left' || sheetFacing === 'right') row = 1;
+              else if (sheetFacing === 'up') row = 2;
+              
+              if (npc.walkTimer > 0) {
+                if (sheetFacing === 'right') col = Math.floor(npc.walkTimer) % 3;
+                else if (sheetFacing === 'left') col = 3 + (Math.floor(npc.walkTimer) % 3);
+                else col = Math.floor(npc.walkTimer) % 6;
+              } else {
+                if (sheetFacing === 'right') col = 1;
+                else if (sheetFacing === 'left') col = 4;
+                else col = 0;
+              }
+            } else {
+              if (sheetFacing === 'left') row = 1;
+              else if (sheetFacing === 'right') row = 2;
+              else if (sheetFacing === 'up') row = 3;
+              
+              if (npc.walkTimer > 0) {
+                const cycle = Math.floor(npc.walkTimer) % frameCount;
+                col = cycle;
+              } else if (npc.id === 'teacher1' && !isClassTime) {
+                // Cô Giáo pacing không có walkTimer -> chạy animation 3 khung theo nhịp bước
+                col = Math.floor(t / 170) % frameCount;
+              }
             }
             
             const drawW = 32;
             const drawH = (frameH / frameW) * drawW;
-            ctx.drawImage(sheetImg, col * frameW, row * frameH, frameW, frameH, -drawW / 2, 12 - drawH, drawW, drawH);
+            // nearest-neighbor, cùng pipeline sprite sắc nét như các nhân vật khác
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(sheetImg, col * frameW, row * frameH, frameW, frameH, Math.round(-drawW / 2), Math.round(12 - drawH), drawW, drawH);
+            ctx.imageSmoothingEnabled = true;
           }
         } else if (customImg && customImg.complete && customImg.width > 0) {
           const drawW = 32;
@@ -2360,6 +2480,19 @@ export default function GameCanvas() {
 
         ctx.restore();
       });
+
+      // 3.5 Re-draw desk tops over seated NPCs (classroom only) so lower body is hidden
+      if (currentLocation === 'classroom') {
+        const fillRoundRect2 = (x, y, w, h, r) => {
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
+          ctx.fill();
+        };
+      // 5. Draw Overlays
+      if (currentLocation === 'classroom') {
+        // No overlays needed now that NPCs are not seated.
+      }
+      }
 
       // Shadow placed precisely under the feet
       // Sprite with walk animation frames
@@ -2867,15 +3000,90 @@ export default function GameCanvas() {
             doctor_ai_rightWalk1: 'doctor_ai_right_walk1',
             doctor_ai_rightWalk2: 'doctor_ai_right_walk2',
           };
-          for (const [key, file] of Object.entries(docFrames)) {
-            const img = new Image();
-            img.src = `/images/${file}.png`;
-            window.customPlayerSprites[key] = img;
+            for (const [key, file] of Object.entries(docFrames)) {
+              const img = new Image();
+              img.src = `/images/${file}.png`;
+              window.customPlayerSprites[key] = img;
+            }
+
+            // Load father spritesheet (imported from assets so Vite bundles it)
+            const fatherImg = new Image();
+            fatherImg.src = window.__fatherSpritesheetSrc;
+            window.customPlayerSprites['father'] = fatherImg;
+
+            // Load teacher spritesheet
+            const teacherImg = new Image();
+            teacherImg.src = window.__teacherSpritesheetSrc;
+            window.customPlayerSprites['teacher'] = teacherImg;
+
+            // Load the three classmate spritesheets (3 bạn học ngồi trong lớp)
+            for (const classmateKey of ['classmate1', 'classmate2', 'classmate3']) {
+              const classmateImg = new Image();
+              classmateImg.src = window[`__${classmateKey}SpritesheetSrc`];
+              window.customPlayerSprites[classmateKey] = classmateImg;
+            }
+
+            // Load mother spritesheet
+            const motherImg = new Image();
+            motherImg.src = window.__motherSpritesheetSrc;
+            motherImg.onload = () => {
+              const canvas = document.createElement('canvas');
+              const fw = motherImg.width / 4;
+              const fh = motherImg.height / 3;
+              canvas.width = motherImg.width;
+              canvas.height = motherImg.height + fh; // 4 rows
+              const ctx = canvas.getContext('2d');
+              
+              // Row 0: Down (original row 0)
+              ctx.drawImage(motherImg, 0, 0, motherImg.width, fh, 0, 0, motherImg.width, fh);
+              
+              // Row 1: Left (original row 1)
+              ctx.drawImage(motherImg, 0, fh, motherImg.width, fh, 0, fh, motherImg.width, fh);
+              
+              // Row 2: Right (mirrored row 1)
+              for (let i = 0; i < 4; i++) {
+                ctx.save();
+                ctx.translate(i * fw + fw, 2 * fh); // translate to the right edge of the target frame
+                ctx.scale(-1, 1);
+                // Draw the original frame i from row 1 (Left)
+                // We draw it at (0, 0) in the transformed context, which means it gets drawn backwards from the right edge
+                ctx.drawImage(motherImg, i * fw, fh, fw, fh, 0, 0, fw, fh);
+                ctx.restore();
+              }
+              
+              // Row 3: Up (original row 2)
+              ctx.drawImage(motherImg, 0, 2 * fh, motherImg.width, fh, 0, 3 * fh, motherImg.width, fh);
+              
+              const finalMotherImg = new Image();
+              finalMotherImg.src = canvas.toDataURL();
+              window.customPlayerSprites['mother'] = finalMotherImg;
+            };
           }
-        }
 
         const customImg = window.customPlayerSprites[spriteKey];
-        if (customImg && customImg.complete && customImg.width > 0) {
+        if (pos.spriteSheet) {
+          const sheetImg = window.customPlayerSprites[pos.spriteSheet];
+          if (sheetImg && sheetImg.complete && sheetImg.width > 0) {
+            let frameCount = 4;
+            if (pos.spriteSheet === 'father' || pos.spriteSheet === 'teacher') frameCount = 6;
+            const frameW = sheetImg.width / frameCount;
+            const frameH = sheetImg.height / 4;
+            let row = 0;
+            if (pos.facing === 'left') row = 1;
+            else if (pos.facing === 'right') row = 2;
+            else if (pos.facing === 'up') row = 3;
+            
+            let col = 0; // stand
+            if (isMoving) {
+              const cycle = Math.floor(Date.now() / 150) % frameCount;
+              col = cycle;
+            }
+            
+            const drawW = 32;
+            const drawH = (frameH / frameW) * drawW;
+            ctx.drawImage(sheetImg, col * frameW, row * frameH, frameW, frameH, -drawW / 2, 12 - drawH, drawW, drawH);
+          }
+        } else if (customImg && customImg.complete && customImg.width > 0) {
           const drawW = 32;
           const drawH = (customImg.height / customImg.width) * drawW;
           // Anchor the bottom of the sprite to the shadow
@@ -3143,9 +3351,9 @@ export default function GameCanvas() {
       else if (currentLocation === 'main') {
         if (pGridX >= 4 && pGridX <= 5 && pGridY >= 11 && pGridY <= 12) {
           fObj = { type: 'house_door', label: 'Vào nhà' };
-        } else if (pGridX >= 36 && pGridX <= 38 && pGridY >= 14 && pGridY <= 16) {
+        } else if (pGridX >= 36 && pGridX <= 38 && pGridY >= 13 && pGridY <= 15) {
           fObj = { type: 'library_door', label: 'Vào thư viện' };
-        } else if (pGridX >= 21 && pGridX <= 23 && pGridY >= 11 && pGridY <= 13) {
+        } else if (pGridX >= 21 && pGridX <= 23 && pGridY >= 10 && pGridY <= 13) {
           fObj = { type: 'school_door', label: 'Vào trường' };
         } else if (pGridX >= 15 && pGridX <= 17 && pGridY >= 23 && pGridY <= 25) {
           fObj = { type: 'hospital_door', label: 'Vào bệnh viện' };
@@ -3218,7 +3426,7 @@ export default function GameCanvas() {
                 <div className="absolute" style={{ left: 1 * 32, top: 4 * 32, zIndex: 16 }}>
                   <HouseBuilding />
                 </div>
-                <div className="absolute" style={{ left: 34 * 32, top: 7 * 32, zIndex: 16 }}>
+                <div className="absolute" style={{ left: 34 * 32, top: 5 * 32, zIndex: 16 }}>
                   <LibraryBuilding />
                 </div>
                 <div className="absolute" style={{ left: 17 * 32, top: 20 * 32, zIndex: 16 }}>

@@ -1,0 +1,71 @@
+
+=== classmate1_final.png ===
+  PASS  geometry 912x800 = 6 cols x 4 rows of 152x200
+  PASS  all 24 cells carry artwork (283294 opaque px total)
+  PASS  0 magenta/pink pixels anywhere in the sheet
+  facing score (px right of centre, + = facing right): down -2.4 | left -12.4 | right 11.8 | up 2.7
+  PASS  LEFT row really looks left (-12.4px)
+  PASS  RIGHT row really looks right (11.8px)
+  PASS  left/right facing magnitudes match (12.4 vs 11.8)
+  PASS  down (-2.4) and up (2.7) rows look straight
+  PASS  down row: legs move across poses (48.5% / 48.8% / 6.3% pixel change)
+  PASS  down row: feet on one baseline (spread 0px)
+  PASS  down row: head anchor stable (x spread 0.7px)
+  PASS  left row: legs move across poses (78.5% / 77.8% / 37.7% pixel change)
+  PASS  left row: feet on one baseline (spread 0px)
+  PASS  left row: head anchor stable (x spread 0.8px)
+  PASS  right row: legs move across poses (46.5% / 77.4% / 71.8% pixel change)
+  PASS  right row: feet on one baseline (spread 0px)
+  PASS  right row: head anchor stable (x spread 0.2px)
+  PASS  up row: legs move across poses (46.0% / 16.6% / 46.5% pixel change)
+  PASS  up row: feet on one baseline (spread 0px)
+  PASS  up row: head anchor stable (x spread 0.1px)
+  PASS  up row: column 5 is the clean replacement of column 4 (watermark removed)
+
+=== classmate2_final.png ===
+  PASS  geometry 912x800 = 6 cols x 4 rows of 152x200
+  PASS  all 24 cells carry artwork (314723 opaque px total)
+  PASS  0 magenta/pink pixels anywhere in the sheet
+  facing score (px right of centre, + = facing right): down -0.6 | left -16.2 | right 15.5 | up 1.8
+  PASS  LEFT row really looks left (-16.2px)
+  PASS  RIGHT row really looks right (15.5px)
+  PASS  left/right facing magnitudes match (16.2 vs 15.5)
+  PASS  down (-0.6) and up (1.8) rows look straight
+  PASS  down row: legs move across poses (35.2% / 32.5% / 22.5% pixel change)
+  PASS  down row: feet on one baseline (spread 0px)
+  PASS  down row: head anchor stable (x spread 0.8px)
+  PASS  left row: legs move across poses (24.5% / 31.5% / 21.9% pixel change)
+  PASS  left row: feet on one baseline (spread 0px)
+  PASS  left row: head anchor stable (x spread 0.9px)
+  PASS  right row: legs move across poses (26.4% / 34.1% / 23.8% pixel change)
+  PASS  right row: feet on one baseline (spread 0px)
+  PASS  right row: head anchor stable (x spread 0.6px)
+  PASS  up row: legs move across poses (32.8% / 27.5% / 39.6% pixel change)
+  PASS  up row: feet on one baseline (spread 0px)
+  PASS  up row: head anchor stable (x spread 0.7px)
+  note  up row column 5 vs 4 differ (33.0% of leg pixels)
+
+=== classmate3_final.png ===
+  PASS  geometry 912x800 = 6 cols x 4 rows of 152x200
+  PASS  all 24 cells carry artwork (253825 opaque px total)
+  PASS  0 magenta/pink pixels anywhere in the sheet
+  facing score (px right of centre, + = facing right): down -0.2 | left -13.8 | right 13.1 | up 2.6
+  PASS  LEFT row really looks left (-13.8px)
+  PASS  RIGHT row really looks right (13.1px)
+  PASS  left/right facing magnitudes match (13.8 vs 13.1)
+  PASS  down (-0.2) and up (2.6) rows look straight
+  PASS  down row: legs move across poses (30.3% / 2.2% / 30.8% pixel change)
+  PASS  down row: feet on one baseline (spread 0px)
+  PASS  down row: head anchor stable (x spread 0.2px)
+  PASS  left row: legs move across poses (36.4% / 45.5% / 20.8% pixel change)
+  PASS  left row: feet on one baseline (spread 0px)
+  PASS  left row: head anchor stable (x spread 0.9px)
+  PASS  right row: legs move across poses (37.7% / 32.8% / 12.5% pixel change)
+  PASS  right row: feet on one baseline (spread 0px)
+  PASS  right row: head anchor stable (x spread 0.0px)
+  PASS  up row: legs move across poses (29.8% / 34.4% / 39.3% pixel change)
+  PASS  up row: feet on one baseline (spread 0px)
+  PASS  up row: head anchor stable (x spread 0.4px)
+  PASS  up row: column 5 is the clean replacement of column 4 (watermark removed)
+
+wrote tmp_classmate_check/final_sheets_3x.png (3x, light background)

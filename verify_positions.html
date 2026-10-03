@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head><title>Desk Layout Verification</title>
+<style>
+  body { background: #333; color: white; font-family: monospace; }
+  canvas { border: 2px solid white; display: block; margin: 20px auto; }
+</style>
+</head>
+<body>
+<h2 style="text-align:center">Classroom Desk + NPC Position Verification</h2>
+<p style="text-align:center">Green = desk surface | Orange = chair | Blue = NPC position (circle = anchor point)</p>
+<canvas id="c" width="640" height="960"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tileSize = 32;
+const scale = 640 / (18 * tileSize); // fit columns 0-17 into 640px
+
+ctx.scale(scale, scale);
+
+// Draw floor
+ctx.fillStyle = '#f5f5dc';
+ctx.fillRect(0, 0, 18 * tileSize, 30 * tileSize);
+
+// Draw grid
+ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+for (let r = 0; r < 30; r++) {
+  for (let c = 0; c < 18; c++) {
+    ctx.strokeRect(c * tileSize, r * tileSize, tileSize, tileSize);
+  }
+}
+
+// Label grid
+ctx.fillStyle = '#999';
+ctx.font = '10px monospace';
+for (let r = 0; r < 30; r += 2) {
+  ctx.fillText(`r${r}`, 1, r * tileSize + 10);
+}
+for (let c = 0; c < 18; c += 2) {
+  ctx.fillText(`c${c}`, c * tileSize + 2, 10);
+}
+
+// Draw blackboard at top
+ctx.fillStyle = '#1e3f20';
+ctx.fillRect(4 * tileSize, 1 * tileSize, 10 * tileSize, tileSize);
+
+// Draw desks
+for (let r = 9; r <= 25; r += 4) {
+  // Left group
+  for (let c = 3; c <= 6; c++) {
+    const x = c * tileSize;
+    const y = r * tileSize;
+    // Desk surface
+    ctx.fillStyle = 'rgba(0, 180, 0, 0.4)';
+    ctx.fillRect(x, y + 2, 32, 20);
+    // Desk edge
+    ctx.fillStyle = 'rgba(0, 150, 0, 0.5)';
+    ctx.fillRect(x, y + 22, 32, 4);
+    // Chair seat
+    ctx.fillStyle = 'rgba(255, 165, 0, 0.4)';
+    ctx.fillRect(x + 8, y + 28, 16, 8);
+    // Chair back
+    ctx.fillStyle = 'rgba(255, 140, 0, 0.4)';
+    ctx.fillRect(x + 8, y + 40, 16, 6);
+  }
+  // Right group
+  for (let c = 11; c <= 14; c++) {
+    const x = c * tileSize;
+    const y = r * tileSize;
+    ctx.fillStyle = 'rgba(0, 180, 0, 0.4)';
+    ctx.fillRect(x, y + 2, 32, 20);
+    ctx.fillStyle = 'rgba(0, 150, 0, 0.5)';
+    ctx.fillRect(x, y + 22, 32, 4);
+    ctx.fillStyle = 'rgba(255, 165, 0, 0.4)';
+    ctx.fillRect(x + 8, y + 28, 16, 8);
+    ctx.fillStyle = 'rgba(255, 140, 0, 0.4)';
+    ctx.fillRect(x + 8, y + 40, 16, 6);
+  }
+}
+
+// Draw NPC positions (from useGameStore.js)
+const npcs = [
+  { id: 'student1', name: 'Nam', x: 4, y: 10, color: 'red' },
+  { id: 'student2', name: 'Hoa', x: 12, y: 10, color: 'blue' },
+  { id: 'student3', name: 'Tuấn', x: 5, y: 14, color: 'purple' },
+];
+
+npcs.forEach(npc => {
+  const nx = npc.x * tileSize;
+  const ny = npc.y * tileSize;
+  const sittingOffset = 4;
+  const anchorX = nx + 16;
+  const anchorY = ny + 28 + sittingOffset;
+
+  // Draw NPC body (simplified 20x28 rectangle)
+  ctx.fillStyle = npc.color;
+  ctx.globalAlpha = 0.6;
+  ctx.fillRect(anchorX - 10, anchorY - 28, 20, 28);
+  ctx.globalAlpha = 1;
+
+  // Anchor point
+  ctx.fillStyle = 'yellow';
+  ctx.beginPath();
+  ctx.arc(anchorX, anchorY, 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Label
+  ctx.fillStyle = 'white';
+  ctx.font = 'bold 11px monospace';
+  ctx.fillText(`${npc.name} (${npc.x},${npc.y})`, anchorX - 30, anchorY - 32);
+});
+
+// Teacher position
+ctx.fillStyle = 'rgba(100, 100, 255, 0.5)';
+const tx = 8 * tileSize + 16;
+const ty = 3 * tileSize + 28;
+ctx.fillRect(tx - 10, ty - 28, 20, 28);
+ctx.fillStyle = 'white';
+ctx.font = 'bold 11px monospace';
+ctx.fillText('Teacher (8,3)', tx - 30, ty - 32);
+</script>
+</body>
+</html>

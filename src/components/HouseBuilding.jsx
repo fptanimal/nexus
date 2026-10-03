@@ -1,5 +1,5 @@
 import React from 'react';
-import houseImg from '../assets/overload_house.png';
+import houseImg from '../assets/overload_house_final.png';
 
 export default function HouseBuilding() {
   return (
